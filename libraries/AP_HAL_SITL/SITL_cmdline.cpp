@@ -227,7 +227,7 @@ void SITL_State::_parse_command_line(int argc, char * const argv[])
     _fg_view_port = FG_VIEW_PORT;
 
     const int SIM_IN_PORT = 9003;
-    const int SIM_OUT_PORT = 9002;
+    const int SIM_OUT_PORT = 50123;
     const int IRLOCK_PORT = 9005;
     const char * simulator_address = "127.0.0.1";
     uint16_t simulator_port_in = SIM_IN_PORT;
