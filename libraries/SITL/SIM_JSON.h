@@ -115,13 +115,13 @@ private:
         enum data_type type;
         bool required;
     } keytable[17] = {
-        { "", "timestamp", &state.timestamp_s, DATA_DOUBLE, true },
+        { "", "timestamp", &state.timestamp_s, DATA_DOUBLE, false },
         { "imu", "gyro",    &state.imu.gyro, DATA_VECTOR3F, true },
         { "imu", "accel_body", &state.imu.accel_body, DATA_VECTOR3F, true },
         { "", "position", &state.position, DATA_VECTOR3D, true },
         { "", "attitude", &state.attitude, DATA_VECTOR3F, false },
         { "", "quaternion", &state.quaternion, QUATERNION, false },
-        { "", "velocity", &state.velocity, DATA_VECTOR3F, true },
+        { "", "velocity", &state.velocity, DATA_VECTOR3F, false },
         { "", "rng_1", &state.rng[0], DATA_FLOAT, false },
         { "", "rng_2", &state.rng[1], DATA_FLOAT, false },
         { "", "rng_3", &state.rng[2], DATA_FLOAT, false },

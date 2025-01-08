@@ -105,8 +105,6 @@ void JSON::output_servos(const struct sitl_input &input)
     ssize_t send_ret = -1;
     if (SRV_Channels::have_32_channels()) {
       servo_packet_32 pkt;
-      pkt.frame_rate = rate_hz;
-      pkt.frame_count = frame_counter;
       for (uint8_t i=0; i<32; i++) {
           pkt.pwm[i] = input.servos[i];
       }
@@ -114,8 +112,6 @@ void JSON::output_servos(const struct sitl_input &input)
       send_ret = sock.sendto(&pkt, pkt_size, target_ip, control_port);
     } else {
       servo_packet_16 pkt;
-      pkt.frame_rate = rate_hz;
-      pkt.frame_count = frame_counter;
       for (uint8_t i=0; i<16; i++) {
           pkt.pwm[i] = input.servos[i];
       }
@@ -356,28 +352,6 @@ void JSON::recv_fdm(const struct sitl_input &input)
         wind_vane_apparent.speed = state.wind_vane_apparent.speed;
     }
 
-    double deltat;
-    if (state.timestamp_s < last_timestamp_s) {
-        // Physics time has gone backwards, don't reset AP
-        printf("Detected physics reset\n");
-        deltat = 0;
-        last_received_bitmask = 0;
-    } else {
-        deltat = state.timestamp_s - last_timestamp_s;
-    }
-    time_now_us += deltat * 1.0e6;
-
-    if (is_positive(deltat) && deltat < 0.1) {
-        // time in us to hz
-        if (use_time_sync) {
-            adjust_frame_time(1.0 / deltat);
-        }
-        // match actual frame rate with desired speedup
-        time_advance();
-    }
-    last_timestamp_s = state.timestamp_s;
-    frame_counter++;
-
 #if 0
 
     float roll, pitch, yaw;
@@ -458,9 +432,6 @@ void JSON::update(const struct sitl_input &input)
     // update magnetic field
     // as the model does not provide mag feild we calculate it from position and attitude
     update_mag_field_bf();
-
-    // allow for changes in physics step
-    adjust_frame_time(constrain_float(sitl->loop_rate_hz, rate_hz-1, rate_hz+1));
 
 #if 0
     // report frame rate
