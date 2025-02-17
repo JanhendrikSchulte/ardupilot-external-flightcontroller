@@ -1,0 +1,4 @@
+# TODO-
+def configure(cfg):
+    cfg.env.DOUBLE_PRECISION_LIBRARIES['SITL'] = True
+    cfg.env.DOUBLE_PRECISION_LIBRARIES['EXTERNALFC'] = True
