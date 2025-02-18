@@ -257,7 +257,8 @@
 //////////////////////////////////////////////////////////////////////////////
 // Autorotate - autonomous auto-rotation - helicopters only
 #ifndef MODE_AUTOROTATE_ENABLED
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO- DON'T KNOW WHAT
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     #if FRAME_CONFIG == HELI_FRAME
         #ifndef MODE_AUTOROTATE_ENABLED
         # define MODE_AUTOROTATE_ENABLED 1

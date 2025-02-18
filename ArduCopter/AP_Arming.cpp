@@ -697,7 +697,7 @@ bool AP_Arming_Copter::arm(const AP_Arming::Method method, const bool do_arming_
         AP::notify().update();
     }
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     send_arm_disarm_statustext("Arming motors");
 #endif
 
@@ -791,7 +791,7 @@ bool AP_Arming_Copter::disarm(const AP_Arming::Method method, bool do_disarm_che
         return false;
     }
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     send_arm_disarm_statustext("Disarming motors");
 #endif
 

@@ -44,7 +44,7 @@ public:
     uint32_t get_uart_output_full_queue_count() const;
 
 private:
-    EXTERNALFC::SITL_State *_sitl_state;
+    HALEXTERNALFC::SITL_State *_sitl_state;
 
     void setup_signal_handlers() const;
     static void exit_signal_handler(int);
@@ -58,7 +58,7 @@ private:
 };
 
 #if HAL_NUM_CAN_IFACES
-typedef EXTERNALFC::CANIface HAL_CANIface;
+typedef HALEXTERNALFC::CANIface HAL_CANIface;
 #endif
 
 #endif  // CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC

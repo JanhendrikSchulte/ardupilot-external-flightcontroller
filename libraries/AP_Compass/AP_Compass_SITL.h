@@ -2,7 +2,7 @@
 
 #include "AP_Compass.h"
 
-#if AP_COMPASS_SITL_ENABLED
+#if AP_COMPASS_SITL_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include "AP_Compass_Backend.h"
 

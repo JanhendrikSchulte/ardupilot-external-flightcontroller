@@ -53,7 +53,11 @@
 #include "AP_Airspeed_NMEA.h"
 #include "AP_Airspeed_MSP.h"
 #include "AP_Airspeed_External.h"
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AP_Airspeed_EXTERNALFC.h"
+#else
 #include "AP_Airspeed_SITL.h"
+#endif
 extern const AP_HAL::HAL &hal;
 
 #include <AP_Vehicle/AP_FixedWing.h>
@@ -66,7 +70,8 @@ extern const AP_HAL::HAL &hal;
 #elif APM_BUILD_TYPE(APM_BUILD_ArduPlane)
  // The HAL_BOARD_SITL setting is required because of current probe process for MS4525 will
  // connect and find the SIM_DLVR sensors & fault as there is no way to tell them apart
- #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+ // TODO-
+ #if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
   #define ARSPD_DEFAULT_TYPE TYPE_ANALOG
   #define ARSPD_DEFAULT_PIN 1
  #else

@@ -27,7 +27,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 void SITL_State::_set_param_default(const char *parm)
 {
@@ -81,7 +81,7 @@ void SITL_State::_sitl_setup()
         _update_airspeed(0);
 #if AP_SIM_SOLOGIMBAL_ENABLED
         if (enable_gimbal) {
-            gimbal = NEW_NOTHROW SITL::SoloGimbal();
+            gimbal = NEW_NOTHROW EXTERNALFC::SoloGimbal();
         }
 #endif
 
@@ -132,7 +132,7 @@ void SITL_State::_fdm_input_step(void)
     _scheduler->sitl_begin_atomic();
 
     if (_update_count == 0 && _sitl != nullptr) {
-        EXTERNALFC::Scheduler::timer_event();
+        HALEXTERNALFC::Scheduler::timer_event();
         _scheduler->sitl_end_atomic();
         return;
     }
@@ -143,7 +143,7 @@ void SITL_State::_fdm_input_step(void)
     }
 
     // trigger all APM timers.
-    EXTERNALFC::Scheduler::timer_event();
+    HALEXTERNALFC::Scheduler::timer_event();
     _scheduler->sitl_end_atomic();
 }
 
@@ -185,7 +185,7 @@ void SITL_State::wait_clock(uint64_t wait_time_usec)
     // conditions.
     if (speedup > 1 && hal.scheduler->in_main_thread()) {
         while (true) {
-            EXTERNALFC::UARTDriver *uart = (EXTERNALFC::UARTDriver*)hal.serial(0);
+            HALEXTERNALFC::UARTDriver *uart = (HALEXTERNALFC::UARTDriver*)hal.serial(0);
             const int queue_length = uart->get_system_outqueue_length();
             // ::fprintf(stderr, "queue_length=%d\n", (signed)queue_length);
             if (queue_length < 1024) {
@@ -203,8 +203,8 @@ void SITL_State::wait_clock(uint64_t wait_time_usec)
  */
 void SITL_State::_output_to_flightgear(void)
 {
-    SITL::FGNetFDM fdm {};
-    const SITL::sitl_fdm &sfdm = _sitl->state;
+    EXTERNALFC::FGNetFDM fdm {};
+    const EXTERNALFC::sitl_fdm &sfdm = _sitl->state;
 
     fdm.version = 0x18;
     fdm.padding = 0;
@@ -350,17 +350,17 @@ void SITL_State::_simulator_servos(struct sitl_input &input)
         
         // pass wind into simulators using different wind types via param SIM_WIND_T*.
         switch (_sitl->wind_type) {
-        case SITL::SIM::WIND_TYPE_SQRT:
+        case EXTERNALFC::SIM::WIND_TYPE_SQRT:
             if (altitude < _sitl->wind_type_alt) {
                 wind_speed *= sqrtf(MAX(altitude / _sitl->wind_type_alt, 0));
             }
             break;
 
-        case SITL::SIM::WIND_TYPE_COEF:
+        case EXTERNALFC::SIM::WIND_TYPE_COEF:
             wind_speed += (altitude - _sitl->wind_type_alt) * _sitl->wind_type_coef;
             break;
 
-        case SITL::SIM::WIND_TYPE_NO_LIMIT:
+        case EXTERNALFC::SIM::WIND_TYPE_NO_LIMIT:
         default:
             break;
         }

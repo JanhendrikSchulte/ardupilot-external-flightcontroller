@@ -21,7 +21,8 @@
 #ifndef HAL_NO_UARTDRIVER
 #include <GCS_MAVLink/GCS.h>
 #endif
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #include <assert.h>
 #endif
 
@@ -189,7 +190,8 @@ uint16_t DSP::step_calc_frequencies(FFTWindowState* fft, uint16_t start_bin, uin
 
 void DSP::update_average_from_sliding_window(FFTWindowState* fft)
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #define ASSERT_MAX(v) assert((v)<(fft->_num_stored_freqs * fft->_sliding_window_size))
 #else
 #define ASSERT_MAX(v)

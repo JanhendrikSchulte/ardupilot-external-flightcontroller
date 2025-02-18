@@ -39,7 +39,8 @@
 #include <GCS_MAVLink/GCS.h>
 #include <AP_InertialSensor/AP_InertialSensor.h>
 #include <AP_CustomRotations/AP_CustomRotations.h>
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #include <SITL/SITL.h>
 #endif
 #include <AP_NavEKF3/AP_NavEKF3_feature.h>
@@ -481,8 +482,8 @@ void AP_AHRS::update(bool skip_ins_update)
 
     // update published state
     update_state();
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     /*
       add timing jitter to simulate slow EKF response
      */

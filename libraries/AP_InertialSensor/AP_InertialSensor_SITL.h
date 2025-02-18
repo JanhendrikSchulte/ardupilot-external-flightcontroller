@@ -2,7 +2,7 @@
 
 #include "AP_InertialSensor.h"
 
-#if AP_SIM_INS_ENABLED
+#if AP_SIM_INS_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include "AP_InertialSensor_Backend.h"
 

@@ -22,7 +22,7 @@
 #endif
 #include "SCurve.h"
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #include <stdio.h>
 #endif
 
@@ -84,7 +84,7 @@ void SCurve::calculate_track(const Vector3f &origin, const Vector3f &destination
 
     // avoid divide-by zeros. Path will be left as a zero length path
     if (!is_positive(snap_max) || !is_positive(jerk_max) || !is_positive(accel_max) || !is_positive(vel_max)) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::printf("SCurve::calculate_track created zero length path\n");
 #endif
         INTERNAL_ERROR(AP_InternalError::error_t::invalid_arg_or_result);
@@ -103,7 +103,7 @@ void SCurve::calculate_track(const Vector3f &origin, const Vector3f &destination
 
     // catch calculation errors
     if (!valid()) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::printf("SCurve::calculate_track invalid path\n");
         debug();
 #endif
@@ -336,7 +336,7 @@ void SCurve::set_speed_max(float speed_xy, float speed_up, float speed_down)
 
     // catch calculation errors
     if (!valid()) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::printf("SCurve::set_speed_max invalid path\n");
         debug();
 #endif
@@ -416,7 +416,7 @@ float SCurve::set_origin_speed_max(float speed)
 
     // catch calculation errors
     if (!valid()) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::printf("SCurve::set_origin_speed_max invalid path\n");
         debug();
 #endif
@@ -469,7 +469,7 @@ void SCurve::set_destination_speed_max(float speed)
 
     // catch calculation errors
     if (!valid()) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::printf("SCurve::set_destination_speed_max invalid path\n");
         debug();
 #endif
@@ -796,7 +796,7 @@ void SCurve::calculate_path(float Sm, float Jm, float V0, float Am, float Vm, fl
 
     // check for invalid arguments
     if (!is_positive(Sm) || !is_positive(Jm) || !is_positive(Am) || !is_positive(Vm) || !is_positive(L)) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::printf("SCurve::calculate_path invalid inputs\n");
 #endif
         INTERNAL_ERROR(AP_InternalError::error_t::invalid_arg_or_result);
@@ -862,7 +862,7 @@ void SCurve::calculate_path(float Sm, float Jm, float V0, float Am, float Vm, fl
         !isfinite(t2_out) || is_negative(t2_out) ||
         !isfinite(t4_out) || is_negative(t4_out) ||
         !isfinite(t6_out) || is_negative(t6_out)) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::printf("SCurve::calculate_path invalid outputs\n");
 #endif
         INTERNAL_ERROR(AP_InternalError::error_t::invalid_arg_or_result);
@@ -1086,7 +1086,7 @@ bool SCurve::valid() const
     return true;
 }
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 // debugging messages
 void SCurve::debug() const
 {

@@ -544,11 +544,11 @@ AP_DAL &dal()
  */
 void rprintf(const char *format, ...)
 {
-
-#if (APM_BUILD_TYPE(APM_BUILD_Replay) || CONFIG_HAL_BOARD == HAL_BOARD_SITL) && CONFIG_HAL_BOARD != HAL_BOARD_CHIBIOS
+// TODO-TBU
+#if (APM_BUILD_TYPE(APM_BUILD_Replay) || CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC) && CONFIG_HAL_BOARD != HAL_BOARD_CHIBIOS
 #if APM_BUILD_TYPE(APM_BUILD_Replay)
     const char *fname = "/tmp/replay.log";
-#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     const char *fname = "/tmp/real.log";
 #endif
     static FILE *f;

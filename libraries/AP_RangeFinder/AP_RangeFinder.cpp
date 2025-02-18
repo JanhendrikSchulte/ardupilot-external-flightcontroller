@@ -51,6 +51,7 @@
 #include "AP_RangeFinder_Lanbao.h"
 #include "AP_RangeFinder_LeddarVu8.h"
 #include "AP_RangeFinder_SITL.h"
+#include "AP_RangeFinder_EXTERNALFC.h"
 #include "AP_RangeFinder_MSP.h"
 #include "AP_RangeFinder_USD1_CAN.h"
 #include "AP_RangeFinder_Benewake_CAN.h"
@@ -182,7 +183,7 @@ RangeFinder::RangeFinder()
 {
     AP_Param::setup_object_defaults(this, var_info);
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("Rangefinder must be singleton");
     }

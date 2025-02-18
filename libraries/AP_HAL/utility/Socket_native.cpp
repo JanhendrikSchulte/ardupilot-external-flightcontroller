@@ -2,8 +2,8 @@
   variant of SocketAPM using native sockets (not via lwip)
  */
 #include <AP_HAL/AP_HAL_Boards.h>
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #include "Socket_native.h"
 
 #if AP_SOCKET_NATIVE_ENABLED

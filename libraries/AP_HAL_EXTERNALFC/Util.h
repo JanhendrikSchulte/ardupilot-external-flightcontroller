@@ -12,7 +12,7 @@
 #include <signal.h>
 #endif
 
-class EXTERNALFC::Util : public AP_HAL::Util {
+class HALEXTERNALFC::Util : public AP_HAL::Util {
 public:
     Util(SITL_State *_sitlState) :
         sitlState(_sitlState) {}

@@ -1,6 +1,6 @@
 #include "AP_Compass_SITL.h"
 
-#if AP_COMPASS_SITL_ENABLED
+#if AP_COMPASS_SITL_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include <AP_HAL/AP_HAL.h>
 

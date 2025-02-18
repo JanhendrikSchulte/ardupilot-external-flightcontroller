@@ -37,8 +37,8 @@ enum class check_fw_result_t : uint8_t {
 #define APP_FW_MAJOR FW_MAJOR
 #define APP_FW_MINOR FW_MINOR
 #endif
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL && !defined(APJ_BOARD_ID)
+// TODO-
+#if (CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC) && !defined(APJ_BOARD_ID)
 // this allows for sitl_periph to build
 #define APJ_BOARD_ID 0
 #endif

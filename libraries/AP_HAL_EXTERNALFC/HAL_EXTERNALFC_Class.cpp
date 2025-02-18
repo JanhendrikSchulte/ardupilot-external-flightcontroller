@@ -34,7 +34,7 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_RCProtocol/AP_RCProtocol_config.h>
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 HAL_SITL& hal_sitl = (HAL_SITL&)AP_HAL::get_HAL_mutable();
 
@@ -79,12 +79,12 @@ static SPIDeviceManager spi_mgr_instance;
 static Util utilInstance(&sitlState);
 
 #if HAL_NUM_CAN_IFACES
-static EXTERNALFC::CANIface* canDrivers[HAL_NUM_CAN_IFACES];
+static HALEXTERNALFC::CANIface* canDrivers[HAL_NUM_CAN_IFACES];
 #endif
 
 static Empty::WSPIDeviceManager wspi_mgr_instance;
 
-HAL_EXTERNALFCHAL_SITL() :
+HAL_SITL::HAL_SITL() :
     AP_HAL::HAL(
         &sitlSerial0Driver,
         &sitlSerial1Driver,
@@ -164,17 +164,17 @@ static void sig_alrm(int signum)
     execv(new_argv[0], new_argv);
 }
 
-void HAL_EXTERNALFCexit_signal_handler(int signum)
+void HAL_SITL::exit_signal_handler(int signum)
 {
-    EXTERNALFC::Scheduler::_should_exit = true;
+    HALEXTERNALFC::Scheduler::_should_exit = true;
 }
 
-void HAL_EXTERNALFCsetup_signal_handlers() const
+void HAL_SITL::setup_signal_handlers() const
 {
     struct sigaction sa = { };
 
     sa.sa_flags = SA_NOCLDSTOP;
-    sa.sa_handler = HAL_EXTERNALFCexit_signal_handler;
+    sa.sa_handler = HAL_SITL::exit_signal_handler;
     sigaction(SIGTERM, &sa, NULL);
 #if defined(HAL_COVERAGE_BUILD) && HAL_COVERAGE_BUILD == 1
     sigaction(SIGINT, &sa, NULL);
@@ -194,24 +194,24 @@ static void fill_stack_nan(void)
     fill_nanf(stk, ARRAY_SIZE(stk));
 }
 
-uint8_t HAL_EXTERNALFCget_instance() const
+uint8_t HAL_SITL::get_instance() const
 {
     return _sitl_state->get_instance();
 }
 
 #if defined(HAL_BUILD_AP_PERIPH)
-bool HAL_EXTERNALFCrun_in_maintenance_mode() const
+bool HAL_SITL::run_in_maintenance_mode() const
 {
     return _sitl_state->run_in_maintenance_mode();
 }
 #endif
 
-uint32_t HAL_EXTERNALFCget_uart_output_full_queue_count() const
+uint32_t HAL_SITL::get_uart_output_full_queue_count() const
 {
     return _sitl_state->_serial_0_outqueue_full_count;
 }
 
-void HAL_EXTERNALFCrun(int argc, char * const argv[], Callbacks* callbacks) const
+void HAL_SITL::run(int argc, char * const argv[], Callbacks* callbacks) const
 {
     assert(callbacks);
 
@@ -276,7 +276,7 @@ void HAL_EXTERNALFCrun(int argc, char * const argv[], Callbacks* callbacks) cons
     uint8_t fill_count = 0;
 
     while (true) {
-        if (EXTERNALFC::Scheduler::_should_exit) {
+        if (HALEXTERNALFC::Scheduler::_should_exit) {
             ::fprintf(stderr, "Exitting\n");
             exit(0);
         }
@@ -287,7 +287,7 @@ void HAL_EXTERNALFCrun(int argc, char * const argv[], Callbacks* callbacks) cons
             fill_stack_nan();
         }
         callbacks->loop();
-        EXTERNALFC::Scheduler::_run_io_procs();
+        HALEXTERNALFC::Scheduler::_run_io_procs();
 
         uint32_t now = AP_HAL::millis();
         if (now - last_watchdog_save >= 100 && using_watchdog) {
@@ -305,7 +305,7 @@ void HAL_EXTERNALFCrun(int argc, char * const argv[], Callbacks* callbacks) cons
     actually_reboot();
 }
 
-void HAL_EXTERNALFCactually_reboot()
+void HAL_SITL::actually_reboot()
 {
     execv(new_argv[0], new_argv);
     AP_HAL::panic("PANIC: REBOOT FAILED: %s", strerror(errno));

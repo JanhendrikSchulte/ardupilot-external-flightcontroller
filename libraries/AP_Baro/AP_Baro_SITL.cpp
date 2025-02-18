@@ -1,6 +1,6 @@
 #include "AP_Baro_SITL.h"
 
-#if AP_SIM_BARO_ENABLED
+#if AP_SIM_BARO_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>

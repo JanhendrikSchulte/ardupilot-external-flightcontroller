@@ -267,8 +267,8 @@ void GCS::update_sensor_status_flags()
     }
     control_sensors_health |= MAV_SYS_STATUS_SENSOR_MOTOR_OUTPUTS;
 #endif
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL && AP_AHRS_ENABLED
+// TODO-TBU
+#if (CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC) && AP_AHRS_ENABLED
     if (ahrs.get_ekf_type() == 10) {
         // always show EKF type 10 as healthy. This prevents spurious error
         // messages in xplane and other simulators that use EKF type 10

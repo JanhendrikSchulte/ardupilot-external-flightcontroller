@@ -43,7 +43,11 @@
 #include "AP_GPS_ExternalAHRS.h"
 #include "GPS_Backend.h"
 #if HAL_SIM_GPS_ENABLED
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AP_GPS_EXTERNALFC.h"
+#else
 #include "AP_GPS_SITL.h"
+#endif
 #endif
 
 #if HAL_ENABLE_DRONECAN_DRIVERS

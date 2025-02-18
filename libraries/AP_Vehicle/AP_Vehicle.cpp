@@ -937,8 +937,8 @@ void AP_Vehicle::reboot(bool hold_in_bootloader)
 
     // do not process incoming mavlink messages while we delay:
     hal.scheduler->register_delay_callback(nullptr, 5);
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU why?
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // need to ensure the ack goes out:
     hal.serial(0)->flush();
 #endif

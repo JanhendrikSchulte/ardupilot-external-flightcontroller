@@ -1595,7 +1595,8 @@ bool AC_PosControl::pre_arm_checks(const char *param_prefix,
 // return true if on a real vehicle or SITL with lock-step scheduling
 bool AC_PosControl::has_good_timing(void) const
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     auto *sitl = AP::sitl();
     if (sitl) {
         return sitl->state.is_lock_step_scheduled;

@@ -2,7 +2,7 @@
 
 #include "AC_PrecLand_config.h"
 
-#if AC_PRECLAND_SITL_ENABLED
+#if AC_PRECLAND_SITL_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include <AC_PrecLand/AC_PrecLand_Backend.h>
 #include <AP_Math/AP_Math.h>

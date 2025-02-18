@@ -46,7 +46,7 @@ AP_CustomRotations::AP_CustomRotations()
 {
     AP_Param::setup_object_defaults(this, var_info);
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (singleton != nullptr) {
         AP_HAL::panic("AP_CustomRotations must be singleton");
     }

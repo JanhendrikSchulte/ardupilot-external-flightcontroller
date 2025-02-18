@@ -41,7 +41,7 @@ const AP_Param::GroupInfo AP_Mount::var_info[] = {
 AP_Mount::AP_Mount()
 {
     if (_singleton != nullptr) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Mount must be singleton");
 #endif
         return;
@@ -1014,7 +1014,7 @@ void AP_Mount::handle_message(mavlink_channel_t chan, const mavlink_message_t &m
         handle_gimbal_device_attitude_status(msg);
         break;
     default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Unhandled mount case");
 #endif
         break;

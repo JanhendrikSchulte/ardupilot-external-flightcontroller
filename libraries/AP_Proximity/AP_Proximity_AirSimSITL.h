@@ -17,7 +17,7 @@
 
 #include "AP_Proximity_config.h"
 
-#if AP_PROXIMITY_AIRSIMSITL_ENABLED
+#if AP_PROXIMITY_AIRSIMSITL_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include "AP_Proximity_Backend.h"
 

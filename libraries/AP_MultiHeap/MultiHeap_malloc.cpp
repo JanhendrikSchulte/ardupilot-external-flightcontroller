@@ -49,8 +49,8 @@ void MultiHeap::heap_destroy(void *heap_ptr)
         INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
         return;
     }
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (heapp->current_heap_usage != 0) {
         // lua should guarantee that there is no memory still
         // allocated when we destroy the heap. Throw an error in SITL

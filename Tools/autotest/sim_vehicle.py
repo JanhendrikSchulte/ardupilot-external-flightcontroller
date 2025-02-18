@@ -1588,7 +1588,7 @@ if True:
     if cmd_opts.vehicle_binary is not None:
         vehicle_binary = cmd_opts.vehicle_binary
     else:
-        binary_basedir = "build/external"
+        binary_basedir = "build/externalfc"
         vehicle_binary = os.path.join(root_dir,
                                       binary_basedir,
                                       frame_infos["waf_target"])

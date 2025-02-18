@@ -109,7 +109,7 @@ const AP_Param::GroupInfo AP_Networking::var_info[] = {
  */
 AP_Networking::AP_Networking(void)
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (singleton != nullptr) {
         AP_HAL::panic("AP_Networking must be singleton");
     }

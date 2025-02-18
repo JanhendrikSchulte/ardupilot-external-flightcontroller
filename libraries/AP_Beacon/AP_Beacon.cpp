@@ -21,7 +21,11 @@
 #include "AP_Beacon_Pozyx.h"
 #include "AP_Beacon_Marvelmind.h"
 #include "AP_Beacon_Nooploop.h"
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AP_Beacon_EXTERNALFC.h"
+#else 
 #include "AP_Beacon_SITL.h"
+#endif
 
 #include <AP_Common/Location.h>
 #include <AP_Logger/AP_Logger.h>
@@ -83,7 +87,7 @@ const AP_Param::GroupInfo AP_Beacon::var_info[] = {
 
 AP_Beacon::AP_Beacon()
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("Fence must be singleton");
     }
@@ -111,6 +115,7 @@ void AP_Beacon::init(void)
     case Type::Nooploop:
         _driver = NEW_NOTHROW AP_Beacon_Nooploop(*this);
         break;
+// TODO-TBD
 #if AP_BEACON_SITL_ENABLED
     case Type::SITL:
         _driver = NEW_NOTHROW AP_Beacon_SITL(*this);

@@ -29,12 +29,14 @@
 #include <AP_DroneCAN/AP_DroneCAN.h>
 #include <AP_CANManager/AP_CANManager.h>
 #endif
-
-#if AP_SIM_ENABLED
+// TODO-APSIM
+#if AP_SIM_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include <EXTERNALFC/EXTERNALFC.h>
+#elif AP_SIM_ENABLED 
 #include <SITL/SITL.h>
 #endif
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
   #define RELAY1_PIN_DEFAULT 13
 
 #elif CONFIG_HAL_BOARD == HAL_BOARD_LINUX
@@ -192,7 +194,7 @@ AP_Relay::AP_Relay(void)
 {
     AP_Param::setup_object_defaults(this, var_info);
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (singleton != nullptr) {
         AP_HAL::panic("AP_Relay must be singleton");
     }

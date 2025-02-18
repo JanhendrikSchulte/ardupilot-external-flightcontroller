@@ -260,7 +260,7 @@ void MAVLink_routing::send_to_components(const char *pkt, const mavlink_msg_entr
                  (unsigned)routes[i].sysid,
                  (unsigned)routes[i].compid);
 #endif
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         if (entry->max_msg_len > pkt_len) {
             AP_HAL::panic("Passed packet message length (%u > %u)",
                           entry->max_msg_len, pkt_len);

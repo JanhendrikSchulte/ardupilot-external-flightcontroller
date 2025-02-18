@@ -72,10 +72,10 @@
 
 class HAL_SITL;
 
-class EXTERNALFC::SITL_State_Common {
-    friend class EXTERNALFC::Scheduler;
-    friend class EXTERNALFC::Util;
-    friend class EXTERNALFC::GPIO;
+class HALEXTERNALFC::SITL_State_Common {
+    friend class HALEXTERNALFC::Scheduler;
+    friend class HALEXTERNALFC::Util;
+    friend class HALEXTERNALFC::GPIO;
 public:
     virtual void init(int argc, char * const argv[]) = 0;
 
@@ -90,7 +90,7 @@ public:
 
     // create a simulated serial device; type of device is given by
     // name parameter
-    SITL::SerialDevice *create_serial_sim(const char *name, const char *arg, const uint8_t portNumber);
+    EXTERNALFC::SerialDevice *create_serial_sim(const char *name, const char *arg, const uint8_t portNumber);
 
     // simulated airspeed, sonar and battery monitor
     float sonar_pin_voltage;    // pin 0
@@ -108,122 +108,122 @@ public:
 #if AP_SIM_SOLOGIMBAL_ENABLED
     // simulated gimbal
     bool enable_gimbal;
-    SITL::SoloGimbal *gimbal;
+    EXTERNALFC::SoloGimbal *gimbal;
 #endif
 
 #if HAL_SIM_ADSB_ENABLED
     // simulated ADSb
-    SITL::ADSB *adsb;
+    EXTERNALFC::ADSB *adsb;
 #endif
 
 #if AP_SIM_ADSB_SAGETECH_MXS_ENABLED
-    SITL::ADSB_Sagetech_MXS *sagetech_mxs;
+    EXTERNALFC::ADSB_Sagetech_MXS *sagetech_mxs;
 #endif
 
 #if !defined(HAL_BUILD_AP_PERIPH)
     // simulated vicon system:
-    SITL::Vicon *vicon;
+    EXTERNALFC::Vicon *vicon;
 #endif
 
     // simulated Ainstein LR-D1 rangefinder:
-    SITL::RF_Ainstein_LR_D1 *ainsteinlrd1;
+    EXTERNALFC::RF_Ainstein_LR_D1 *ainsteinlrd1;
     // simulated Benewake tf02 rangefinder:
-    SITL::RF_Benewake_TF02 *benewake_tf02;
+    EXTERNALFC::RF_Benewake_TF02 *benewake_tf02;
     // simulated Benewake tf03 rangefinder:
-    SITL::RF_Benewake_TF03 *benewake_tf03;
+    EXTERNALFC::RF_Benewake_TF03 *benewake_tf03;
     //simulated JAE JRE rangefinder:
-    SITL::RF_JRE *jre;
+    EXTERNALFC::RF_JRE *jre;
     // simulated Benewake tfmini rangefinder:
-    SITL::RF_Benewake_TFmini *benewake_tfmini;
+    EXTERNALFC::RF_Benewake_TFmini *benewake_tfmini;
     //simulated NoopLoop TOFSense rangefinder:
-    SITL::RF_Nooploop *nooploop;
+    EXTERNALFC::RF_Nooploop *nooploop;
     // simulated TeraRanger Serial:
-    SITL::RF_TeraRanger_Serial *teraranger_serial;
+    EXTERNALFC::RF_TeraRanger_Serial *teraranger_serial;
 
     // simulated LightWareSerial rangefinder - legacy protocol::
-    SITL::RF_LightWareSerial *lightwareserial;
+    EXTERNALFC::RF_LightWareSerial *lightwareserial;
     // simulated LightWareSerial rangefinder - binary protocol:
-    SITL::RF_LightWareSerialBinary *lightwareserial_binary;
+    EXTERNALFC::RF_LightWareSerialBinary *lightwareserial_binary;
     // simulated Lanbao rangefinder:
-    SITL::RF_Lanbao *lanbao;
+    EXTERNALFC::RF_Lanbao *lanbao;
     // simulated BLping rangefinder:
-    SITL::RF_BLping *blping;
+    EXTERNALFC::RF_BLping *blping;
     // simulated LeddarOne rangefinder:
-    SITL::RF_LeddarOne *leddarone;
+    EXTERNALFC::RF_LeddarOne *leddarone;
     // simulated RDS02UF rangefinder:
-    SITL::RF_RDS02UF *rds02uf;
+    EXTERNALFC::RF_RDS02UF *rds02uf;
     // simulated USD1 v0 rangefinder:
-    SITL::RF_USD1_v0 *USD1_v0;
+    EXTERNALFC::RF_USD1_v0 *USD1_v0;
     // simulated USD1 v1 rangefinder:
-    SITL::RF_USD1_v1 *USD1_v1;
+    EXTERNALFC::RF_USD1_v1 *USD1_v1;
     // simulated MaxsonarSerialLV rangefinder:
-    SITL::RF_MaxsonarSerialLV *maxsonarseriallv;
+    EXTERNALFC::RF_MaxsonarSerialLV *maxsonarseriallv;
     // simulated Wasp rangefinder:
-    SITL::RF_Wasp *wasp;
+    EXTERNALFC::RF_Wasp *wasp;
     // simulated NMEA rangefinder:
-    SITL::RF_NMEA *nmea;
+    EXTERNALFC::RF_NMEA *nmea;
     // simulated MAVLink rangefinder:
-    SITL::RF_MAVLink *rf_mavlink;
+    EXTERNALFC::RF_MAVLink *rf_mavlink;
     // simulated GYUS42v2 rangefinder:
-    SITL::RF_GYUS42v2 *gyus42v2;
+    EXTERNALFC::RF_GYUS42v2 *gyus42v2;
 
     // simulated Frsky devices
-    SITL::Frsky_D *frsky_d;
-    // SITL::Frsky_SPort *frsky_sport;
-    // SITL::Frsky_SPortPassthrough *frsky_sportpassthrough;
+    EXTERNALFC::Frsky_D *frsky_d;
+    // EXTERNALFC::Frsky_SPort *frsky_sport;
+    // EXTERNALFC::Frsky_SPortPassthrough *frsky_sportpassthrough;
 
 #if HAL_SIM_PS_RPLIDARA2_ENABLED
     // simulated RPLidarA2:
-    SITL::PS_RPLidarA2 *rplidara2;
+    EXTERNALFC::PS_RPLidarA2 *rplidara2;
 #endif
 
     // simulated FETtec OneWire ESCs:
-    SITL::FETtecOneWireESC *fetteconewireesc;
-
+    EXTERNALFC::FETtecOneWireESC *fetteconewireesc;
+#if HAL_SIM_PS_RPLIDARA1_ENABLED
     // simulated RPLidarA1:
-    SITL::PS_RPLidarA1 *rplidara1;
-
+    EXTERNALFC::PS_RPLidarA1 *rplidara1;
+#endif
 #if HAL_SIM_PS_LIGHTWARE_SF45B_ENABLED
     // simulated SF45B proximity sensor:
-    SITL::PS_LightWare_SF45B *sf45b;
+    EXTERNALFC::PS_LightWare_SF45B *sf45b;
 #endif
 
 #if HAL_SIM_PS_TERARANGERTOWER_ENABLED
-    SITL::PS_TeraRangerTower *terarangertower;
+    EXTERNALFC::PS_TeraRangerTower *terarangertower;
 #endif
 
 #if AP_SIM_CRSF_ENABLED
     // simulated CRSF devices
-    SITL::CRSF *crsf;
+    EXTERNALFC::CRSF *crsf;
 #endif
 
     // simulated VectorNav system:
-    SITL::VectorNav *vectornav;
+    EXTERNALFC::VectorNav *vectornav;
 
     // simulated MicroStrain system
-    SITL::MicroStrain5 *microstrain5;
+    EXTERNALFC::MicroStrain5 *microstrain5;
 
     // simulated MicroStrain system
-    SITL::MicroStrain7 *microstrain7;
+    EXTERNALFC::MicroStrain7 *microstrain7;
 
     // simulated InertialLabs INS
-    SITL::InertialLabs *inertiallabs;
+    EXTERNALFC::InertialLabs *inertiallabs;
     
 #if HAL_SIM_JSON_MASTER_ENABLED
     // Ride along instances via JSON SITL backend
-    SITL::JSON_Master ride_along;
+    EXTERNALFC::JSON_Master ride_along;
 #endif
 
 #if HAL_SIM_AIS_ENABLED
     // simulated AIS stream
-    SITL::AIS *ais;
+    EXTERNALFC::AIS *ais;
 #endif
 
     // simulated EFI MegaSquirt device:
-    SITL::EFI_MegaSquirt *efi_ms;
+    EXTERNALFC::EFI_MegaSquirt *efi_ms;
 
     // simulated EFI MegaSquirt device:
-    SITL::EFI_Hirth *efi_hirth;
+    EXTERNALFC::EFI_Hirth *efi_hirth;
 
     // output socket for flightgear viewing
     SocketAPM_native fg_socket{true};
@@ -231,10 +231,10 @@ public:
     const char *defaults_path = HAL_PARAM_DEFAULTS_PATH;
 
     // simulated GPS devices
-    SITL::GPS *gps[AP_SIM_MAX_GPS_SENSORS];  // constrained by # of parameter sets
+    EXTERNALFC::GPS *gps[AP_SIM_MAX_GPS_SENSORS];  // constrained by # of parameter sets
 
     // Simulated ELRS radio
-    SITL::ELRS *elrs;
+    EXTERNALFC::ELRS *elrs;
 
     // returns a voltage between 0V to 5V which should appear as the
     // voltage from the sensor
@@ -257,9 +257,9 @@ protected:
     void sim_update(void);
 
     // internal SITL model
-    SITL::Aircraft *sitl_model;
+    EXTERNALFC::Aircraft *sitl_model;
 
-    SITL::SIM *_sitl;
+    EXTERNALFC::SIM *_sitl;
 
     void update_voltage_current(struct sitl_input &input, float throttle);
 };

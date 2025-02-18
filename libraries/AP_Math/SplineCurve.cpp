@@ -18,7 +18,7 @@
 #include <AP_InternalError/AP_InternalError.h>
 #include "SplineCurve.h"
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #include <stdio.h>
 #endif
 
@@ -148,7 +148,7 @@ void SplineCurve::calc_dt_speed_max(float time, float distance_delta, float &spl
 
     // vel, accel and jerk should never all be zero
     if (spline_vel.is_zero() && spline_accel.is_zero() && spline_jerk.is_zero()) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::printf("SplineCurve::calc_dt_speed_max vel, accel and jerk are all zero\n");
 #endif
         INTERNAL_ERROR(AP_InternalError::error_t::invalid_arg_or_result);
@@ -186,7 +186,7 @@ void SplineCurve::calc_dt_speed_max(float time, float distance_delta, float &spl
 
     // sanity check to avoid divide by zero
     if (is_zero(tangential_speed_max)) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::printf("SplineCurve::calc_dt_speed_max tangential_speed_max is zero\n");
 #endif
         INTERNAL_ERROR(AP_InternalError::error_t::invalid_arg_or_result);
@@ -204,7 +204,7 @@ void SplineCurve::calc_dt_speed_max(float time, float distance_delta, float &spl
     // calculate accel max and sanity check
     accel_max = TANGENTIAL_ACCEL_SCALER * kinematic_limit(spline_vel_unit, _accel_xy, _accel_z, _accel_z);
     if (is_zero(accel_max)) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::printf("SplineCurve::calc_dt_speed_max accel_max is zero\n");
 #endif
         INTERNAL_ERROR(AP_InternalError::error_t::invalid_arg_or_result);

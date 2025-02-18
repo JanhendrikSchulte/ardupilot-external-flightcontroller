@@ -56,7 +56,7 @@ AP_Rally::AP_Rally()
 {
     ASSERT_STORAGE_SIZE(RallyLocation, 15);
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("Rally must be singleton");
     }

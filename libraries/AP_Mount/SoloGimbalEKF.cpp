@@ -6,7 +6,8 @@
 
 // uncomment this to force the optimisation of this code, note that
 // this makes debugging harder
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX
+// TODO-TBC
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #pragma GCC optimize("O0")
 #else
 #pragma GCC optimize("O2")

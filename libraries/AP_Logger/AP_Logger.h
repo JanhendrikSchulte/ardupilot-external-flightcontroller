@@ -301,7 +301,7 @@ public:
 
     bool logging_started(void) const;
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // currently only AP_Logger_File support this:
     void flush(void);
 #endif
@@ -476,7 +476,7 @@ private:
 
     static AP_Logger *_singleton;
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     bool validate_structure(const struct LogStructure *logstructure, int16_t offset);
     void validate_structures(const struct LogStructure *logstructures, const uint8_t num_types);
     void dump_structure_field(const struct LogStructure *logstructure, const char *label, const uint8_t fieldnum);

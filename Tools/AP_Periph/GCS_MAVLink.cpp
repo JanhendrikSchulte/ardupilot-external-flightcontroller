@@ -79,7 +79,7 @@ MAV_RESULT GCS_MAVLINK_Periph::handle_preflight_reboot(const mavlink_command_int
     periph.prepare_reboot();
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
     NVIC_SystemReset();
-#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     HAL_SITL::actually_reboot();
 #endif
 }

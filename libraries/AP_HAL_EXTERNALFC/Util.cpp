@@ -10,10 +10,10 @@
 extern const AP_HAL::HAL& hal;
 
 #ifdef WITH_SITL_TONEALARM
-EXTERNALFC::ToneAlarm_SF EXTERNALFC::Util::_toneAlarm;
+HALEXTERNALFC::ToneAlarm_SF HALEXTERNALFC::Util::_toneAlarm;
 #endif
 
-uint64_t EXTERNALFC::Util::get_hw_rtc() const
+uint64_t HALEXTERNALFC::Util::get_hw_rtc() const
 {
 #ifndef CLOCK_REALTIME
     struct timeval ts;
@@ -31,7 +31,7 @@ uint64_t EXTERNALFC::Util::get_hw_rtc() const
 /*
   get a (hopefully unique) machine ID
  */
-bool EXTERNALFC::Util::get_system_id_unformatted(uint8_t buf[], uint8_t &len)
+bool HALEXTERNALFC::Util::get_system_id_unformatted(uint8_t buf[], uint8_t &len)
 {
     char *cbuf = (char *)buf;
 
@@ -79,14 +79,14 @@ bool EXTERNALFC::Util::get_system_id_unformatted(uint8_t buf[], uint8_t &len)
   as get_system_id_unformatted will already be ascii, we use the same
   ID here
  */
-bool EXTERNALFC::Util::get_system_id(char buf[50])
+bool HALEXTERNALFC::Util::get_system_id(char buf[50])
 {
     uint8_t len = 40;
     return get_system_id_unformatted((uint8_t *)buf, len);
 }
 
 #if !defined(HAL_BUILD_AP_PERIPH)
-enum AP_HAL::Util::safety_state EXTERNALFC::Util::safety_switch_state(void)
+enum AP_HAL::Util::safety_state HALEXTERNALFC::Util::safety_switch_state(void)
 {
 #define HAL_USE_PWM 1
 #if HAL_USE_PWM
@@ -96,7 +96,7 @@ enum AP_HAL::Util::safety_state EXTERNALFC::Util::safety_switch_state(void)
 #endif
 }
 
-void EXTERNALFC::Util::set_cmdline_parameters()
+void HALEXTERNALFC::Util::set_cmdline_parameters()
 {
     for (uint16_t i=0; i<sitlState->cmdline_param.available(); i++) {
         const auto param = sitlState->cmdline_param[i];
@@ -110,7 +110,7 @@ void EXTERNALFC::Util::set_cmdline_parameters()
 /**
    return commandline arguments, if available
 */
-void EXTERNALFC::Util::commandline_arguments(uint8_t &argc, char * const *&argv)
+void HALEXTERNALFC::Util::commandline_arguments(uint8_t &argc, char * const *&argv)
 {
     argc = saved_argc;
     argv = saved_argv;
@@ -119,7 +119,7 @@ void EXTERNALFC::Util::commandline_arguments(uint8_t &argc, char * const *&argv)
 /**
  * This method will read random values with set size.
  */
-bool EXTERNALFC::Util::get_random_vals(uint8_t* data, size_t size)
+bool HALEXTERNALFC::Util::get_random_vals(uint8_t* data, size_t size)
 {
     int dev_random = open("/dev/urandom", O_RDONLY);
     if (dev_random < 0) {
@@ -136,7 +136,7 @@ bool EXTERNALFC::Util::get_random_vals(uint8_t* data, size_t size)
 
 #if HAL_UART_STATS_ENABLED
 // request information on uart I/O
-void EXTERNALFC::Util::uart_info(ExpandingString &str)
+void HALEXTERNALFC::Util::uart_info(ExpandingString &str)
 {
     // Calculate time since last call
     const uint32_t now_ms = AP_HAL::millis();
@@ -159,7 +159,7 @@ void EXTERNALFC::Util::uart_info(ExpandingString &str)
 
 #if HAL_LOGGING_ENABLED
 // Log UART message for each serial port
-void EXTERNALFC::Util::uart_log()
+void HALEXTERNALFC::Util::uart_log()
 {
     // Calculate time since last call
     const uint32_t now_ms = AP_HAL::millis();

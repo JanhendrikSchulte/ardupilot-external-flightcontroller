@@ -13,9 +13,9 @@
 
 #include <EXTERNALFC/SIM_SerialDevice.h>
 
-class EXTERNALFC::UARTDriver : public AP_HAL::UARTDriver {
+class HALEXTERNALFC::UARTDriver : public AP_HAL::UARTDriver {
 public:
-    friend class EXTERNALFC::SITL_State;
+    friend class HALEXTERNALFC::SITL_State;
 
     UARTDriver(const uint8_t portNumber, SITL_State *sitlState) {
         _portNumber = portNumber;
@@ -121,7 +121,7 @@ private:
 
     HAL_Semaphore write_mtx;
 
-    SITL::SerialDevice *_sim_serial_device;
+    EXTERNALFC::SerialDevice *_sim_serial_device;
 
     struct {
         bool active;

@@ -4,6 +4,6 @@
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 
-#include "HAL_SITL_Class.h"
+#include "HAL_EXTERNALFC_Class.h"
 
 #endif  // CONFIG_HAL_BOARD

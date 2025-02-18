@@ -5,7 +5,12 @@
 #include "AP_RCProtocol_FDM.h"
 
 #include <AP_HAL/AP_HAL.h>
+
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include <EXTERNALFC/EXTERNALFC.h>
+#else
 #include <SITL/SITL.h>
+#endif
 
 extern const AP_HAL::HAL& hal;
 

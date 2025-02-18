@@ -1,6 +1,6 @@
 #include "SIMState.h"
-
-#if AP_SIM_ENABLED && CONFIG_HAL_BOARD != HAL_BOARD_SITL
+// TODO TBD
+#if AP_SIM_ENABLED && (CONFIG_HAL_BOARD != HAL_BOARD_SITL && CONFIG_HAL_BOARD != HAL_BOARD_EXTERNALFC)
 
 /*
  *  This is a very-much-cut-down AP_HAL_SITL object.  We should make

@@ -847,7 +847,7 @@ bool AP_Mission::read_cmd_from_storage(uint16_t index, Mission_Command& cmd) con
     }
 
     if (stored_in_location(cmd.id)) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         // NOTE!  no 16-bit command may be stored_in_location as only
         // 10 bytes are available for storage and lat/lon/alt required
         // 4*sizeof(float) == 12 bytes of storage.
@@ -2873,7 +2873,7 @@ const char *AP_Mission::Mission_Command::type() const
     case MAV_CMD_VIDEO_STOP_CAPTURE:
         return "VideoStopCapture";
     default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Mission command with ID %u has no string", id);
 #endif
         return "?";

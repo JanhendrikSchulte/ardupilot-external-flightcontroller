@@ -23,7 +23,7 @@
 #define STORAGE_LINE_SIZE (1<<STORAGE_LINE_SHIFT)
 #define STORAGE_NUM_LINES (HAL_STORAGE_SIZE/STORAGE_LINE_SIZE)
 
-class EXTERNALFC::Storage : public AP_HAL::Storage {
+class HALEXTERNALFC::Storage : public AP_HAL::Storage {
 public:
     void init() override {}
     void read_block(void *dst, uint16_t src, size_t n) override;

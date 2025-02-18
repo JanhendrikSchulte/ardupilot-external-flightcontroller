@@ -16,8 +16,12 @@
 #include <AP_AHRS/AP_AHRS.h>
 
 #include "AP_Compass_config.h"
-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include "AP_Compass_SITL.h"
+#endif
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AP_Compass_EXTERNALFC.h"
+#endif
 #include "AP_Compass_AK8963.h"
 #include "AP_Compass_Backend.h"
 #include "AP_Compass_BMM150.h"
@@ -707,7 +711,7 @@ const AP_Param::GroupInfo Compass::var_info[] = {
 Compass::Compass(void)
 {
     if (_singleton != nullptr) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Compass must be singleton");
 #endif
         return;

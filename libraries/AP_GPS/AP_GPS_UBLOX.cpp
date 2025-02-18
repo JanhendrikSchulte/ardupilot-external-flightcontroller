@@ -2272,7 +2272,8 @@ void AP_GPS_UBLOX::clear_RTCMV3(void)
 // ublox specific healthy checks
 bool AP_GPS_UBLOX::is_healthy(void) const
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (gps._auto_config == AP_GPS::GPS_AUTO_CONFIG_DISABLE) {
         // allow for fake ublox moving baseline
         return true;

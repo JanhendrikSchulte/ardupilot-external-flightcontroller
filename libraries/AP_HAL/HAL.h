@@ -43,7 +43,7 @@ public:
         AP_HAL::Util*       _util,
         AP_HAL::OpticalFlow*_opticalflow,
         AP_HAL::Flash*      _flash,
-#if AP_SIM_ENABLED && CONFIG_HAL_BOARD != HAL_BOARD_SITL
+#if AP_SIM_ENABLED && (CONFIG_HAL_BOARD != HAL_BOARD_SITL && CONFIG_HAL_BOARD != HAL_BOARD_EXTERNALFC)
         class AP_HAL::SIMState*   _simstate,
 #endif
 #if HAL_WITH_DSP
@@ -82,7 +82,7 @@ public:
             _serial7,
             _serial8,
             _serial9}
-#if AP_SIM_ENABLED && CONFIG_HAL_BOARD != HAL_BOARD_SITL
+#if AP_SIM_ENABLED && (CONFIG_HAL_BOARD != HAL_BOARD_SITL && CONFIG_HAL_BOARD != HAL_BOARD_EXTERNALFC)
             ,simstate(_simstate)
 #endif
     {
@@ -148,7 +148,8 @@ private:
     AP_HAL::UARTDriver* serial_array[num_serial];
 
 public:
-#if AP_SIM_ENABLED && CONFIG_HAL_BOARD != HAL_BOARD_SITL
+// TODO-TBU
+#if AP_SIM_ENABLED && (CONFIG_HAL_BOARD != HAL_BOARD_SITL && CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC)
     AP_HAL::SIMState *simstate;
 #endif
 

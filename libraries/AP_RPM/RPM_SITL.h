@@ -16,7 +16,7 @@
 
 #include "AP_RPM.h"
 
-#if AP_RPM_SIM_ENABLED
+#if AP_RPM_SIM_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include "RPM_Backend.h"
 #include <SITL/SITL.h>

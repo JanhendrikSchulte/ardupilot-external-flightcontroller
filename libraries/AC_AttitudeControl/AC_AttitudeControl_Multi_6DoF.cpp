@@ -149,7 +149,7 @@ void AC_AttitudeControl_Multi_6DoF::input_angle_step_bf_roll_pitch_yaw(float rol
 // Command a Quaternion attitude with feedforward and smoothing
 // attitude_desired_quat: is updated on each time_step (_dt) by the integral of the angular velocity
 void AC_AttitudeControl_Multi_6DoF::input_quaternion(Quaternion& attitude_desired_quat, Vector3f ang_vel_body) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     AP_HAL::panic("input_quaternion not implemented AC_AttitudeControl_Multi_6DoF");
 #endif
 

@@ -359,8 +359,8 @@ bool AP_Logger_Backend::message_type_from_block(const void *pBuffer, uint16_t si
     type = LogMessages(((uint8_t*)pBuffer)[2]);
     return true;
 }
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 void AP_Logger_Backend::validate_WritePrioritisedBlock(const void *pBuffer,
                                                        uint16_t size)
 {
@@ -440,7 +440,7 @@ bool AP_Logger_Backend::ensure_format_emitted(const void *pBuffer, uint16_t size
 
 bool AP_Logger_Backend::WritePrioritisedBlock(const void *pBuffer, uint16_t size, bool is_critical, bool writev_streaming)
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL && !APM_BUILD_TYPE(APM_BUILD_Replay)
+#if (CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC) && !APM_BUILD_TYPE(APM_BUILD_Replay)
     validate_WritePrioritisedBlock(pBuffer, size);
 #endif
     if (!ShouldLog(is_critical)) {

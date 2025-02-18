@@ -9,11 +9,11 @@
 #define SITL_SCHEDULER_MAX_TIMER_PROCS 8
 
 /* Scheduler implementation: */
-class EXTERNALFC::Scheduler : public AP_HAL::Scheduler {
+class HALEXTERNALFC::Scheduler : public AP_HAL::Scheduler {
 public:
     explicit Scheduler(SITL_State *sitlState);
     static Scheduler *from(AP_HAL::Scheduler *scheduler) {
-        return static_cast<EXTERNALFC::Scheduler*>(scheduler);
+        return static_cast<HALEXTERNALFC::Scheduler*>(scheduler);
     }
 
     /* AP_HAL::Scheduler methods */

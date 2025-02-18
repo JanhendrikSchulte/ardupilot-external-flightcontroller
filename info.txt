@@ -1,0 +1,6 @@
+PREFIX: TODO-
+TBC - to be clarified
+TBU - to be understood
+POI - point of interest
+TR - to remove
+any number - importance

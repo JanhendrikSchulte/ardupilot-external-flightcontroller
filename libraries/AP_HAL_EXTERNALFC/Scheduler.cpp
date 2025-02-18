@@ -18,7 +18,7 @@
 #include <sanitizer/asan_interface.h>
 #endif
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 extern const AP_HAL::HAL& hal;
 
@@ -223,7 +223,7 @@ void Scheduler::sitl_end_atomic() {
 
 void Scheduler::reboot(bool hold_in_bootloader)
 {
-    HAL_EXTERNALFCactually_reboot();
+    HAL_SITL::actually_reboot();
     abort();
 }
 
@@ -284,7 +284,7 @@ void Scheduler::_run_io_procs()
     hal.storage->_timer_tick();
 
     // in lieu of a thread-per-bus:
-    ((EXTERNALFC::I2CDeviceManager*)(hal.i2c_mgr))->_timer_tick();
+    ((HALEXTERNALFC::I2CDeviceManager*)(hal.i2c_mgr))->_timer_tick();
 
 #if SITL_STACK_CHECKING_ENABLED
     check_thread_stacks();

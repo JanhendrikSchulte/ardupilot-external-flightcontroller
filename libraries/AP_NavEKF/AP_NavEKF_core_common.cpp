@@ -26,7 +26,8 @@ NavEKF_core_common::Vector28 NavEKF_core_common::Kfusion;
  */
 void NavEKF_core_common::fill_scratch_variables(void)
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // fill the common variables with NaN, so we catch any cases in
     // SITL where they are used without initialisation. These are all
     // supposed to be scratch variables that are not used between

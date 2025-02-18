@@ -48,7 +48,7 @@ const AP_Param::GroupInfo AP_Winch::var_info[] = {
 AP_Winch::AP_Winch()
 {
     if (_singleton) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Too many winches");
 #endif
         return;

@@ -670,21 +670,113 @@ Please use a replacement build as follows:
         _board = _board_classes[ctx.env.BOARD]()
     return _board
 
-class external(Board):
+
+class external2(Board):
+    def __init__(self):
+        if self.toolchain == 'native':
+            self.with_can = True
+        else:
+            self.with_can = False
+
+    def configure_env(self, cfg, env):
+        if cfg.options.board == 'linux':
+            self.with_can = True
+        super(external2, self).configure_env(cfg, env)
+
+        env.BOARD_CLASS = "LINUX"
+
+        env.DEFINES.update(
+            CONFIG_HAL_BOARD = 'HAL_BOARD_LINUX',
+            CONFIG_HAL_BOARD_SUBTYPE = 'HAL_BOARD_SUBTYPE_LINUX_NONE',
+            AP_SIM_ENABLED = 0,
+        )
+
+        if not cfg.env.DEBUG:
+            env.CXXFLAGS += [
+                '-O3',
+            ]
+
+        env.LIB += [
+            'm',
+        ]
+
+        cfg.check_librt(env)
+        cfg.check_lttng(env)
+        cfg.check_libdl(env)
+        cfg.check_libiio(env)
+
+        env.LINKFLAGS += ['-pthread',]
+        env.AP_LIBRARIES += [
+            'AP_HAL_Linux',
+        ]
+
+        # wrap malloc to ensure memory is zeroed
+        env.LINKFLAGS += ['-Wl,--wrap,malloc']
+
+        if cfg.options.force_32bit:
+            env.DEFINES.update(
+                HAL_FORCE_32BIT = 1,
+            )
+            # 32bit platform flags
+            cfg.env.CXXFLAGS += [
+                '-m32',
+            ]
+            cfg.env.CFLAGS += [
+                '-m32',
+            ]
+            cfg.env.LDFLAGS += [
+                '-m32',
+            ]
+        else:
+            env.DEFINES.update(
+                HAL_FORCE_32BIT = 0,
+            )
+        if self.with_can and cfg.options.board == 'linux':
+            cfg.env.HAL_NUM_CAN_IFACES = 2
+            cfg.define('HAL_NUM_CAN_IFACES', 2)
+            cfg.define('HAL_CANFD_SUPPORTED', 1)
+            cfg.define('CANARD_ENABLE_CANFD', 1)
+        
+        if self.with_can:
+            env.DEFINES.update(CANARD_MULTI_IFACE=1,
+                               CANARD_IFACE_ALL = 0x3)
+
+        if cfg.options.apstatedir:
+            cfg.define('AP_STATEDIR', cfg.options.apstatedir)
+
+        defaults_file = 'libraries/AP_HAL_Linux/boards/%s/defaults.parm' % self.get_name()
+        if os.path.exists(defaults_file):
+            env.ROMFS_FILES += [('defaults.parm', defaults_file)]
+            env.DEFINES.update(
+                HAL_PARAM_DEFAULTS_PATH='"@ROMFS/defaults.parm"',
+            )
+
+    def build(self, bld):
+        super(external2, self).build(bld)
+        if bld.options.upload:
+            waflib.Options.commands.append('rsync')
+            # Avoid infinite recursion
+            bld.options.upload = False
+
+    def get_name(self):
+        # get name of class
+        return self.__class__.__name__
+
+class externalfc(Board):
 
     def __init__(self):
         self.with_can = True
 
     def configure_env(self, cfg, env):
-        super(external, self).configure_env(cfg, env)
+        super(externalfc, self).configure_env(cfg, env)
         env.DEFINES.update(
-            CONFIG_HAL_BOARD = 'HAL_BOARD_SITL',
+            CONFIG_HAL_BOARD = 'HAL_BOARD_EXTERNALFC',
             CONFIG_HAL_BOARD_SUBTYPE = 'HAL_BOARD_SUBTYPE_NONE',
             AP_SCRIPTING_CHECKS = 1, # SITL should always do runtime scripting checks
             AP_BARO_PROBE_EXTERNAL_I2C_BUSES = 1,
         )
 
-        env.BOARD_CLASS = "SITL"
+        env.BOARD_CLASS = "EXTERNALFC"
 
         cfg.define('AP_SIM_ENABLED', 1)
         cfg.define('HAL_WITH_SPI', 1)
@@ -771,12 +863,12 @@ class external(Board):
              env.LINKFLAGS += ['-fsanitize=address']
 
         env.AP_LIBRARIES += [
-            'AP_HAL_SITL',
+            'AP_HAL_EXTERNALFC',
             'AP_CSVReader',
         ]
 
         env.AP_LIBRARIES += [
-            'SITL',
+            'EXTERNALFC',
         ]
 
         # wrap malloc to ensure memory is zeroed

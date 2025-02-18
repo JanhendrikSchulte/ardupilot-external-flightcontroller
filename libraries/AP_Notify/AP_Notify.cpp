@@ -47,8 +47,8 @@
 extern const AP_HAL::HAL& hal;
 
 AP_Notify *AP_Notify::_singleton;
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #define CONFIG_NOTIFY_DEVICES_MAX 12
 #else
 #define CONFIG_NOTIFY_DEVICES_MAX 6
@@ -449,8 +449,8 @@ void AP_Notify::add_backends(void)
   #else // other linux
     ADD_BACKEND(NEW_NOTHROW AP_ToneAlarm());
   #endif
-
-#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     ADD_BACKEND(NEW_NOTHROW AP_ToneAlarm());
     ADD_BACKEND(NEW_NOTHROW Buzzer());
 #ifdef WITH_SITL_RGBLED

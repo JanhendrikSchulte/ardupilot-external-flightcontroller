@@ -57,7 +57,7 @@ extern const AP_HAL::HAL& hal;
 #endif
 
 #ifndef HAL_LOGGING_BACKENDS_DEFAULT
-# if HAL_LOGGING_FILESYSTEM_ENABLED && (CONFIG_HAL_BOARD == HAL_BOARD_SITL)
+# if HAL_LOGGING_FILESYSTEM_ENABLED && (CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC)
 #  define HAL_LOGGING_BACKENDS_DEFAULT Backend_Type::FILESYSTEM
 # elif HAL_LOGGING_DATAFLASH_ENABLED
 #  define HAL_LOGGING_BACKENDS_DEFAULT Backend_Type::BLOCK
@@ -214,7 +214,8 @@ void AP_Logger::init(const AP_Int32 &log_bitmask, const struct LogStructure *str
         GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Forcing logging for watchdog reset");
         _params.log_disarmed.set(LogDisarmed::LOG_WHILE_DISARMED);
     }
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     validate_structures(structures, num_types);
     dump_structures(structures, num_types);
 #endif
@@ -267,7 +268,7 @@ void AP_Logger::init(const AP_Int32 &log_bitmask, const struct LogStructure *str
     EnableWrites(true);
 }
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #include <stdio.h>
 
 #define DEBUG_LOG_STRUCTURES 0
@@ -755,7 +756,7 @@ bool AP_Logger::WriteReplayBlock(uint8_t msg_id, const void *pBuffer, uint16_t s
             }
         }
     }
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // things will almost certainly go sour.  However, if we are not
     // logging while disarmed then the EKF can be started and trying
     // to log things even 'though the backends might be saying "no".
@@ -867,7 +868,7 @@ void AP_Logger::periodic_tasks() {
     FOR_EACH_BACKEND(periodic_tasks());
 }
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // currently only AP_Logger_File support this:
 void AP_Logger::flush(void) {
      FOR_EACH_BACKEND(flush());
@@ -1053,8 +1054,8 @@ bool AP_Logger::allow_start_ekf() const
 
     return true;
 }
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 bool AP_Logger::assert_same_fmt_for_name(const AP_Logger::log_write_fmt *f,
                                                const char *name,
                                                const char *labels,
@@ -1111,7 +1112,7 @@ AP_Logger::log_write_fmt *AP_Logger::msg_fmt_for_name(const char *name, const ch
         if (!direct_comp) {
             if (f->name == name) { // ptr comparison
                 // already have an ID for this name:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
                 if (!assert_same_fmt_for_name(f, name, labels, units, mults, fmt)) {
                     return nullptr;
                 }
@@ -1122,7 +1123,7 @@ AP_Logger::log_write_fmt *AP_Logger::msg_fmt_for_name(const char *name, const ch
             // direct comparison used from scripting where pointer is not maintained
             if (strcmp(f->name,name) == 0) {
                 // already have an ID for this name:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
                 if (!assert_same_fmt_for_name(f, name, labels, units, mults, fmt)) {
                     return nullptr;
                 }
@@ -1198,8 +1199,8 @@ AP_Logger::log_write_fmt *AP_Logger::msg_fmt_for_name(const char *name, const ch
         }
         list_end->next = f;
     }
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     struct log_write_fmt_strings ls_strings = {};
     struct LogStructure ls = {
         f->msg_type,
@@ -1371,7 +1372,7 @@ int16_t AP_Logger::Write_calc_msg_len(const char *fmt) const
         case 'q' : len += sizeof(int64_t); break;
         case 'Q' : len += sizeof(uint64_t); break;
         default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("Unknown format specifier (%c)", fmt[i]);
 #endif
             return -1;

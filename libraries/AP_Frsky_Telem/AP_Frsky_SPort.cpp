@@ -229,7 +229,8 @@ void  AP_Frsky_SPort::send_sport_frame(uint8_t frame, uint16_t appid, uint32_t d
             buf2[len++] = c;
         }
     }
-#ifndef HAL_BOARD_SITL
+// TODO-TBU
+#if !defined(HAL_BOARD_SITL) && !defined(HAL_BOARD_EXTERNALFC)
     /*
       check that we haven't been too slow in responding to the new
       UART data. If we respond too late then we will overwrite the next

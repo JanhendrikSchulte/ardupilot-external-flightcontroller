@@ -25,7 +25,7 @@
 
 class SPIBus;
 
-namespace EXTERNALFC {
+namespace HALEXTERNALFC {
 
 struct SPIDesc {
     SPIDesc(const char *_name, uint8_t _bus, uint8_t _cs_pin)

@@ -35,7 +35,7 @@ public:
     AP_Parachute()
     {
         // setup parameter defaults
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         if (_singleton != nullptr) {
             AP_HAL::panic("Parachute must be singleton");
         }

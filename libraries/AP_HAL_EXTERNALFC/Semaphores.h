@@ -7,9 +7,9 @@
 #include "AP_HAL_EXTERNALFC_Namespace.h"
 #include <pthread.h>
 
-class EXTERNALFC::Semaphore : public AP_HAL::Semaphore {
+class HALEXTERNALFC::Semaphore : public AP_HAL::Semaphore {
 public:
-    friend class EXTERNALFC::BinarySemaphore;
+    friend class HALEXTERNALFC::BinarySemaphore;
     Semaphore();
     bool give() override;
     bool take(uint32_t timeout_ms) override;
@@ -27,7 +27,7 @@ protected:
 };
 
 
-class EXTERNALFC::BinarySemaphore : public AP_HAL::BinarySemaphore {
+class HALEXTERNALFC::BinarySemaphore : public AP_HAL::BinarySemaphore {
 public:
     BinarySemaphore(bool initial_state=false);
 
@@ -38,7 +38,7 @@ public:
     void signal(void) override;
 
 private:
-    EXTERNALFC::Semaphore mtx;
+    HALEXTERNALFC::Semaphore mtx;
     pthread_cond_t cond;
     bool pending;
 };

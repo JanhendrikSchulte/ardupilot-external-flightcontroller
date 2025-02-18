@@ -46,7 +46,7 @@ const AP_Param::GroupInfo AP_KDECAN::var_info[] = {
 AP_KDECAN::AP_KDECAN()
 {
     AP_Param::setup_object_defaults(this, var_info);
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("AP_KDECAN must be singleton");
     }

@@ -4,7 +4,11 @@
 #if AP_OPTICALFLOW_ENABLED
 
 #include "AP_OpticalFlow_Onboard.h"
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AP_OpticalFlow_EXTERNALFC.h"
+#else
 #include "AP_OpticalFlow_SITL.h"
+#endif
 #include "AP_OpticalFlow_Pixart.h"
 #include "AP_OpticalFlow_PX4Flow.h"
 #include "AP_OpticalFlow_CXOF.h"

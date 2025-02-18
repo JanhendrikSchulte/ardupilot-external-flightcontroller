@@ -35,7 +35,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-bool EXTERNALFC::UARTDriver::set_speed(int speed) const
+bool HALEXTERNALFC::UARTDriver::set_speed(int speed) const
 {
     if (_fd < 0) {
         return false;
@@ -68,7 +68,7 @@ bool EXTERNALFC::UARTDriver::set_speed(int speed) const
     return true;
 }
 
-void EXTERNALFC::UARTDriver::configure_parity(uint8_t v)
+void HALEXTERNALFC::UARTDriver::configure_parity(uint8_t v)
 {
     if (_fd < 0) {
         return;
@@ -106,7 +106,7 @@ void EXTERNALFC::UARTDriver::configure_parity(uint8_t v)
 #endif
 }
 
-void EXTERNALFC::UARTDriver::set_stop_bits(int n)
+void HALEXTERNALFC::UARTDriver::set_stop_bits(int n)
 {
     if (_fd < 0) {
         return;

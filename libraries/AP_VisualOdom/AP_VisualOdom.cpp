@@ -120,7 +120,7 @@ const AP_Param::GroupInfo AP_VisualOdom::var_info[] = {
 AP_VisualOdom::AP_VisualOdom()
 {
     AP_Param::setup_object_defaults(this, var_info);
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("AP_VisualOdom must be singleton");
     }

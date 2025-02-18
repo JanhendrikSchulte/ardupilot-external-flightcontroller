@@ -83,8 +83,8 @@ void operator delete[](void * ptr)
 {
     if (ptr) free(ptr);
 }
-
-#if defined(CYGWIN_BUILD) && CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if defined(CYGWIN_BUILD) && (CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC)
 /*
   wrapper around malloc to ensure all memory is initialised as zero
   cygwin needs to wrap _malloc_r

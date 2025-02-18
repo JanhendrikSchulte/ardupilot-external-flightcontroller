@@ -1,5 +1,7 @@
 #pragma once
 
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+
 #include <SITL/SITL.h>
 #include "SIM_SerialDevice.h"
 #include <AP_HAL/utility/DataRateLimit.h>
@@ -49,3 +51,4 @@ private:
 };
 
 }
+#endif

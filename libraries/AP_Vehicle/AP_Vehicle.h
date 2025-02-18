@@ -505,8 +505,11 @@ protected:
 
     ModeReason control_mode_reason = ModeReason::UNKNOWN;
 
-#if AP_SIM_ENABLED
+#if AP_SIM_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
     SITL::SIM sitl;
+#endif
+#if AP_SIM_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+    EXTERNALFC::SIM sitl;
 #endif
 
 #if AP_DDS_ENABLED

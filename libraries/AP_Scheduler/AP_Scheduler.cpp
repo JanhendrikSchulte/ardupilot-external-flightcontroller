@@ -38,6 +38,9 @@
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <SITL/SITL.h>
 #endif
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include <EXTERNALFC/EXTERNALFC.h>
+#endif
 #include <stdio.h>
 
 #if APM_BUILD_COPTER_OR_HELI || APM_BUILD_TYPE(APM_BUILD_ArduSub)
@@ -81,7 +84,7 @@ const AP_Param::GroupInfo AP_Scheduler::var_info[] = {
 AP_Scheduler::AP_Scheduler()
 {
     if (_singleton) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Too many schedulers");
 #endif
         return;
@@ -165,8 +168,8 @@ void AP_Scheduler::tick(void)
     _tick_counter++;
     _tick_counter32++;
 }
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 /*
   fill stack with NaN so we can catch use of uninitialised stack
   variables in SITL
@@ -258,7 +261,8 @@ void AP_Scheduler::run(uint32_t time_available)
         // run it
         _task_time_started = now;
         hal.util->persistent_data.scheduler_task = i;
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO- ??
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         fill_nanf_stack();
 #endif
         task.function();
@@ -357,8 +361,8 @@ void AP_Scheduler::loop()
     } else {
         _last_loop_time_s = (sample_time_us - _loop_timer_start_us) * 1.0e-6;
     }
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     {
         /*
           for testing low CPU conditions we can add an optional delay in SITL
@@ -391,8 +395,8 @@ void AP_Scheduler::loop()
 
     // run the tasks
     run(time_available);
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // move result of AP_HAL::micros() forward:
     hal.scheduler->delay_microseconds(1);
 #endif
@@ -418,8 +422,8 @@ void AP_Scheduler::loop()
     perf_info.check_loop_time(sample_time_us - _loop_timer_start_us);
         
     _loop_timer_start_us = sample_time_us;
-
-#if AP_SIM_ENABLED && CONFIG_HAL_BOARD != HAL_BOARD_SITL
+// TODO-TBU
+#if AP_SIM_ENABLED && (CONFIG_HAL_BOARD != HAL_BOARD_SITL && CONFIG_HAL_BOARD != HAL_BOARD_EXTERNALFC)
     hal.simstate->update();
 #endif
 }

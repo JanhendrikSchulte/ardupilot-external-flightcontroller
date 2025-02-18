@@ -54,7 +54,7 @@ void GCS_MAVLINK::handle_fence_message(const mavlink_message_t &msg)
         fence->polyfence().handle_msg(*this, msg);
         break;
     default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Unhandled common fence message");
 #endif
         break;

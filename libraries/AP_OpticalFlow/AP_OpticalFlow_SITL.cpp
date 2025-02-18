@@ -19,7 +19,7 @@
 
 #include "AP_OpticalFlow_SITL.h"
 
-#if AP_OPTICALFLOW_SITL_ENABLED
+#if AP_OPTICALFLOW_SITL_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include <AP_HAL/AP_HAL.h>
 #include <SITL/SITL.h>

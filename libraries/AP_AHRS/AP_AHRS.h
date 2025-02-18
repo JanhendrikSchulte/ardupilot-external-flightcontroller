@@ -31,7 +31,12 @@
 #include <AP_NavEKF/AP_Nav_Common.h>              // definitions shared by inertial and ekf nav filters
 
 #include "AP_AHRS_DCM.h"
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL 
 #include "AP_AHRS_SIM.h"
+#endif
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AP_AHRS_SIM_EXTERNALFC.h"
+#endif
 #include "AP_AHRS_External.h"
 
 // forward declare view class

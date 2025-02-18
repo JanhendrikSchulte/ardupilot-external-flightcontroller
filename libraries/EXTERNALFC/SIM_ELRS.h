@@ -4,6 +4,7 @@
 #include "SIM_SerialDevice.h"
 #include <AP_HAL/utility/DataRateLimit.h>
 #include <AP_HAL/utility/Socket_native.h>
+#include "AP_HAL_EXTERNALFC/AP_HAL_EXTERNALFC_Namespace.h"
 
 namespace EXTERNALFC {
 

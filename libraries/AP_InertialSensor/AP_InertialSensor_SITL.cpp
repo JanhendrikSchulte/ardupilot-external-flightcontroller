@@ -4,7 +4,7 @@
 #include <SITL/SITL.h>
 #include <AP_Filesystem/AP_Filesystem.h>
 
-#if AP_SIM_INS_ENABLED
+#if AP_SIM_INS_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 const extern AP_HAL::HAL& hal;
 

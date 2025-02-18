@@ -2,7 +2,7 @@
 
 #include "AP_Baro_Backend.h"
 
-#if AP_SIM_BARO_ENABLED
+#if AP_SIM_BARO_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include <AP_Math/vectorN.h>
 

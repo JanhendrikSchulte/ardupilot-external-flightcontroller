@@ -395,8 +395,8 @@ void AP_ADSB_uAvionix_UCP::send_Transponder_Control()
     GDL90_TRANSPONDER_CONTROL_MSG msg {};
     msg.messageId = GDL90_ID_TRANSPONDER_CONTROL;
     msg.version = GDL90_TRANSPONDER_CONTROL_VERSION;
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // when using the simulator, always declare we're on the ground to help
     // inhibit chaos if this ias actually being broadcasted on real hardware
     msg.airGroundState =  ADSB_ON_GROUND;

@@ -6,9 +6,11 @@
 
 #include <AC_PrecLand/AC_PrecLand_Backend.h>
 #include <AP_Math/AP_Math.h>
-
+// TODO-
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
  #include <AP_IRLock/AP_IRLock_SITL.h>
+#elif CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+ #include <AP_IRLock/AP_IRLock_EXTERNALFC.h>
 #else
  #include <AP_IRLock/AP_IRLock.h>
 #endif
@@ -32,7 +34,7 @@ public:
     void update() override;
 
 private:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     AP_IRLock_SITL irlock;
 #else
     AP_IRLock_I2C irlock;

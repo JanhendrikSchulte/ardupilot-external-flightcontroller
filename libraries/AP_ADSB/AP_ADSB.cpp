@@ -183,7 +183,7 @@ const AP_Param::GroupInfo AP_ADSB::var_info[] = {
 AP_ADSB::AP_ADSB()
 {
     AP_Param::setup_object_defaults(this, var_info);
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("AP_ADSB must be singleton");
     }

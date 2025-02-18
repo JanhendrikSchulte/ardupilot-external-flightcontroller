@@ -451,7 +451,7 @@ public:
         _prev_nav_cmd_index(AP_MISSION_CMD_INDEX_NONE),
         _prev_nav_cmd_wp_index(AP_MISSION_CMD_INDEX_NONE)
     {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         if (_singleton != nullptr) {
             AP_HAL::panic("Mission must be singleton");
         }

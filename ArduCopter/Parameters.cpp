@@ -572,7 +572,11 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(sprayer,                "SPRAY_",       AC_Sprayer),
 #endif
 
-#if AP_SIM_ENABLED
+#if AP_SIM_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+    // @Group: SIM_
+    // @Path: ../libraries/SITL/SITL.cpp
+    GOBJECT(sitl, "SIM_", EXTERNALFC::SIM),
+#elif AP_SIM_ENABLED
     // @Group: SIM_
     // @Path: ../libraries/SITL/SITL.cpp
     GOBJECT(sitl, "SIM_", SITL::SIM),

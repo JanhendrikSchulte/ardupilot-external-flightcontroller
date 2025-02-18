@@ -358,7 +358,7 @@ bool AC_PolyFence_loader::scan_eeprom(scan_fn_t scan_fn)
     bool all_done = false;
     while (!all_done) {
         if (read_offset > fence_storage.size()) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("did not find end-of-storage-marker before running out of space");
 #endif
             return false;
@@ -376,7 +376,7 @@ bool AC_PolyFence_loader::scan_eeprom(scan_fn_t scan_fn)
         case AC_PolyFenceType::RETURN_POINT:
             break;
         default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("Fence corrupt (offset=%u)", read_offset);
 #endif
             GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Fence corrupt");
@@ -515,7 +515,7 @@ bool AC_PolyFence_loader::index_eeprom()
         return false;
     }
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_num_fences != _eeprom_fence_count) {
         AP_HAL::panic("indexed fences not equal to eeprom fences");
     }
@@ -713,7 +713,7 @@ bool AC_PolyFence_loader::load_from_eeprom()
         storage_offset += 1; // skip type
         switch (index.type) {
         case AC_PolyFenceType::END_OF_STORAGE:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("indexed end of storage found");
 #endif
             storage_valid = false;
@@ -931,7 +931,7 @@ bool AC_PolyFence_loader::validate_fence(const AC_PolyFenceItem *new_items, uint
 
         switch (new_items[i].type) {
         case AC_PolyFenceType::END_OF_STORAGE:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("passed in an END_OF_STORAGE");
 #endif
             return false;
@@ -1084,7 +1084,7 @@ bool AC_PolyFence_loader::write_fence(const AC_PolyFenceItem *new_items, uint16_
             }
             break;
         case AC_PolyFenceType::END_OF_STORAGE:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("asked to store end-of-storage marker");
 #endif
             return false;
@@ -1137,7 +1137,7 @@ bool AC_PolyFence_loader::write_fence(const AC_PolyFenceItem *new_items, uint16_
         return false;
     }
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // sanity-check the EEPROM in SITL to make sure we can read what
     // we've just written.
     if (!index_eeprom()) {
@@ -1191,7 +1191,7 @@ bool AC_PolyFence_loader::get_return_point(Vector2l &ret)
     // inside all inclusion fences...
     uint16_t offset = inc->storage_offset;
     if ((AC_PolyFenceType)fence_storage.read_uint8(offset) != AC_PolyFenceType::POLYGON_INCLUSION) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("wrong type at offset");
 #endif
         return false;
@@ -1199,7 +1199,7 @@ bool AC_PolyFence_loader::get_return_point(Vector2l &ret)
     offset++;
     const uint8_t count = fence_storage.read_uint8(offset);
     if (count < 3) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("invalid count found");
 #endif
         return false;
@@ -1321,7 +1321,7 @@ void AC_PolyFence_loader::handle_msg_fetch_fence_point(GCS_MAVLINK &link, const 
                 Vector2l bob;
                 if (!read_latlon_from_storage(storage_offset, bob)) {
                     link.send_text(MAV_SEVERITY_WARNING, "Fence read failed");
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
                     AP_HAL::panic("read failure");
 #endif
                     return;
@@ -1380,7 +1380,7 @@ AC_PolyFence_loader::FenceIndex *AC_PolyFence_loader::get_or_create_return_point
         }
     } else {
         if (fence_storage.read_uint8(_eos_offset) != (uint8_t)AC_PolyFenceType::END_OF_STORAGE) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("Expected end-of-storage marker at offset=%u",
                           _eos_offset);
 #endif
@@ -1402,7 +1402,7 @@ AC_PolyFence_loader::FenceIndex *AC_PolyFence_loader::get_or_create_return_point
     }
 
     if (!index_eeprom()) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Failed to index eeprom after moving inclusion fence for return point");
 #endif
         return nullptr;
@@ -1410,7 +1410,7 @@ AC_PolyFence_loader::FenceIndex *AC_PolyFence_loader::get_or_create_return_point
 
     return_point = find_first_fence(AC_PolyFenceType::RETURN_POINT);
     if (return_point == nullptr) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Failed to get return point after indexing");
 #endif
     }
@@ -1439,13 +1439,13 @@ AC_PolyFence_loader::FenceIndex *AC_PolyFence_loader::get_or_create_include_fenc
     }
 
     if (!index_eeprom()) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Failed to index eeprom after creating fence");
 #endif
         return nullptr;
     }
     AC_PolyFence_loader::FenceIndex *ret = find_first_fence(AC_PolyFenceType::POLYGON_INCLUSION);
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (ret == nullptr) {
         AP_HAL::panic("Failed to index eeprom after creating fence");
     }
@@ -1502,7 +1502,7 @@ void AC_PolyFence_loader::handle_msg_fence_point(GCS_MAVLINK &link, const mavlin
         // update it, otherwise create a return point fence thingy
         const FenceIndex *return_point = get_or_create_return_point();
         if (return_point == nullptr) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("Didn't get return point");
 #endif
             return;
@@ -1530,7 +1530,7 @@ void AC_PolyFence_loader::handle_msg_fence_point(GCS_MAVLINK &link, const mavlin
     } else {
         const FenceIndex *inclusion_fence = get_or_create_include_fence();
         if (inclusion_fence == nullptr) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("no inclusion fences found");
 #endif
             return;
@@ -1568,7 +1568,7 @@ bool AC_PolyFence_loader::contains_compatible_fence() const
     for (uint16_t i=0; i<_num_fences; i++) {
         switch (_index[i].type) {
         case AC_PolyFenceType::END_OF_STORAGE:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("end-of-storage marker found in loaded list");
 #endif
             return false;

@@ -108,7 +108,8 @@ public:
     // ramifications of being out of memory are that you don't start
     // the EKF, so the simplicity of having one value for the entire
     // frame is worthwhile.
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     uint32_t available_memory() const { return _RFRN.available_memory + 10240; }
 #else
     uint32_t available_memory() const { return _RFRN.available_memory; }

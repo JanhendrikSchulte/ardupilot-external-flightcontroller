@@ -27,7 +27,7 @@
 typedef std::complex<float> complexf;
 
 // ChibiOS implementation of FFT analysis to run on STM32 processors
-class EXTERNALFC::DSP : public AP_HAL::DSP {
+class HALEXTERNALFC::DSP : public AP_HAL::DSP {
 public:
     // initialise an FFT instance
     virtual FFTWindowState* fft_init(uint16_t window_size, uint16_t sample_rate, uint8_t sliding_window_size) override;
@@ -38,7 +38,7 @@ public:
 
     // STM32-based FFT state
     class FFTWindowStateSITL : public AP_HAL::DSP::FFTWindowState {
-        friend class EXTERNALFC::DSP;
+        friend class HALEXTERNALFC::DSP;
 
     public:
         FFTWindowStateSITL(uint16_t window_size, uint16_t sample_rate, uint8_t sliding_window_size);

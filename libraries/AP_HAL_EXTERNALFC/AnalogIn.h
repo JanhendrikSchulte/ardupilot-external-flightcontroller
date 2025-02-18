@@ -8,9 +8,9 @@
 #define SITL_ADC_FULL_SCALE_VOLTAGE 5.0f
 #define SITL_INPUT_MAX_CHANNELS 12
 
-class EXTERNALFC::ADCSource : public AP_HAL::AnalogSource {
+class HALEXTERNALFC::ADCSource : public AP_HAL::AnalogSource {
 public:
-    friend class EXTERNALFC::AnalogIn;
+    friend class HALEXTERNALFC::AnalogIn;
     /* pin designates the ADC input number */
     ADCSource(SITL_State *sitlState, int16_t pin);
 
@@ -31,7 +31,7 @@ private:
 
 /* AnalogIn : a concrete class providing the implementations of the
  * timer event and the AP_HAL::AnalogIn interface */
-class EXTERNALFC::AnalogIn : public AP_HAL::AnalogIn {
+class HALEXTERNALFC::AnalogIn : public AP_HAL::AnalogIn {
 public:
     explicit AnalogIn(SITL_State *sitlState): _sitlState(sitlState) {}
     void init() override;

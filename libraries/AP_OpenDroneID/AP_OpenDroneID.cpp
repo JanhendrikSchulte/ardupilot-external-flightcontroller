@@ -91,7 +91,7 @@ const AP_Param::GroupInfo AP_OpenDroneID::var_info[] = {
 // constructor
 AP_OpenDroneID::AP_OpenDroneID()
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("OpenDroneID must be singleton");
     }

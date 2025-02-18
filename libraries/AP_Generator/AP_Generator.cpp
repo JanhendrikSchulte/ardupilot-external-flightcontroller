@@ -51,7 +51,7 @@ AP_Generator::AP_Generator()
     AP_Param::setup_object_defaults(this, var_info);
 
     if (_singleton) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Too many generators");
 #endif
         return;

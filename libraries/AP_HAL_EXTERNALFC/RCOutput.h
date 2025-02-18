@@ -5,7 +5,7 @@
 #include "AP_HAL_EXTERNALFC.h"
 #include <AP_ESC_Telem/AP_ESC_Telem_EXTERNALFC.h>
 
-class EXTERNALFC::RCOutput : public AP_HAL::RCOutput {
+class HALEXTERNALFC::RCOutput : public AP_HAL::RCOutput {
 public:
     explicit RCOutput(SITL_State *sitlState): _sitlState(sitlState), _freq_hz(50) {}
     void init() override;

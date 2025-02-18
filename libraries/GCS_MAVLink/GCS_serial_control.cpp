@@ -96,7 +96,7 @@ void GCS_MAVLINK::handle_serial_control(const mavlink_message_t &msg)
     }
     if (stream == nullptr) {
         // this is probably very bad
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("stream is nullptr");
 #endif
         return;

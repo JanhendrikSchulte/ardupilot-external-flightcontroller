@@ -55,7 +55,7 @@
 
 extern HAL_SITL& hal;
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 using namespace EXTERNALFC;
 
 // catch floating point exceptions
@@ -352,7 +352,7 @@ void SITL_State::_parse_command_line(int argc, char * const argv[])
 
     if (is_example) {
         model_str = "novehicle";
-        EXTERNALFC::UARTDriver::_console = true;
+        HALEXTERNALFC::UARTDriver::_console = true;
     }
 
     // storage defaults are set here:
@@ -394,7 +394,7 @@ void SITL_State::_parse_command_line(int argc, char * const argv[])
             printf("Setting SIM_RATE_HZ=%f\n", sim_rate_hz);
             break;
         case 'C':
-            EXTERNALFC::UARTDriver::_console = true;
+            HALEXTERNALFC::UARTDriver::_console = true;
             break;
         case 'I': {
             _instance = atoi(gopt.optarg);

@@ -17,7 +17,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 // returns a voltage between 0V to 5V which should appear as the
 // voltage from the sensor

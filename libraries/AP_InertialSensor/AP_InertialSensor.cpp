@@ -29,7 +29,11 @@
 #include "AP_InertialSensor_LSM9DS0.h"
 #include "AP_InertialSensor_LSM9DS1.h"
 #include "AP_InertialSensor_Invensense.h"
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AP_InertialSensor_EXTERNALFC.h"
+#else
 #include "AP_InertialSensor_SITL.h"
+#endif
 #include "AP_InertialSensor_RST.h"
 #include "AP_InertialSensor_BMI055.h"
 #include "AP_InertialSensor_BMI088.h"
@@ -68,7 +72,8 @@ extern const AP_HAL::HAL& hal;
 #else
 #define DEFAULT_GYRO_FILTER  20
 #define DEFAULT_ACCEL_FILTER 20
-#if APM_BUILD_TYPE(APM_BUILD_ArduPlane) && CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if APM_BUILD_TYPE(APM_BUILD_ArduPlane) && (CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC)
     // In steady-state level flight on SITL Plane, especially while the motor is off, the INS system
     // returns ins.is_still()==true. Baseline vibes while airborne are unrealistically low: around 0.07.
     // A real aircraft would be experiencing micro turbulence and be rocking around a tiny bit. Therefore,
@@ -756,8 +761,8 @@ bool AP_InertialSensor::register_gyro(uint8_t &instance, uint16_t raw_sample_rat
     }
 
     _gyro_id(_gyro_count).set((int32_t) id);
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (!saved) {
         // assume this is the same sensor and save its ID to allow seamless
         // transition from when we didn't have the IDs.
@@ -830,7 +835,7 @@ bool AP_InertialSensor::register_accel(uint8_t &instance, uint16_t raw_sample_ra
 
     _accel_id(_accel_count).set((int32_t) id);
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || (CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS && AP_SIM_ENABLED)
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC || (CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS && AP_SIM_ENABLED)
         // assume this is the same sensor and save its ID to allow seamless
         // transition from when we didn't have the IDs.
         _accel_id_ok[_accel_count] = true;
@@ -1997,7 +2002,8 @@ void AP_InertialSensor::update(void)
  */
 void AP_InertialSensor::wait_for_sample(void)
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     auto *sitl = AP::sitl();
     if (sitl == nullptr) {
         hal.scheduler->delay_microseconds(1000);

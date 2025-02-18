@@ -17,9 +17,9 @@
 
 #include "GPS_Backend.h"
 
+#if HAL_SIM_GPS_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <SITL/SITL.h>
 
-#if HAL_SIM_GPS_ENABLED
 
 class AP_GPS_SITL : public AP_GPS_Backend
 {

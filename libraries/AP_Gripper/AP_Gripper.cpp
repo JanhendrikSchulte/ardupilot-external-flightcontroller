@@ -82,7 +82,7 @@ const AP_Param::GroupInfo AP_Gripper::var_info[] = {
 AP_Gripper::AP_Gripper()
 {
     if (_singleton) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Too many grippers");
 #endif
         return;

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <AP_HAL/AP_HAL_Boards.h>
-
-#if AP_SIM_ENABLED
+ 
+#if AP_SIM_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 
 #include <AP_Math/AP_Math.h>
 #include <GCS_MAVLink/GCS_MAVLink.h>

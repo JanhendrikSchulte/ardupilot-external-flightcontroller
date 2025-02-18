@@ -2,7 +2,7 @@
 
 #include "AP_Beacon_Backend.h"
 
-#if AP_BEACON_SITL_ENABLED
+#if AP_BEACON_SITL_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include <SITL/SITL.h>
 

@@ -55,7 +55,7 @@ bool AP_Mission::start_command_do_gripper(const AP_Mission::Mission_Command& cmd
         GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Gripper Grabbed");
         return true;
     default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Unhandled gripper case");
 #endif
         return false;
@@ -94,7 +94,7 @@ bool AP_Mission::start_command_do_servorelayevents(const AP_Mission::Mission_Com
 #endif
 
     default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Unhandled servo/relay case");
 #endif
         return false;
@@ -224,7 +224,7 @@ bool AP_Mission::start_command_camera(const AP_Mission::Mission_Command& cmd)
     }
 
     default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Unhandled camera case");
 #endif
         return false;

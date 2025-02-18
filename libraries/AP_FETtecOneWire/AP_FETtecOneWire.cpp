@@ -71,7 +71,7 @@ AP_FETtecOneWire::AP_FETtecOneWire()
 {
     AP_Param::setup_object_defaults(this, var_info);
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("AP_FETtecOneWire must be singleton");
     }
@@ -395,7 +395,7 @@ void AP_FETtecOneWire::handle_message(ESC &esc, const uint8_t length)
 #if HAL_WITH_ESC_TELEM
         if (!esc.telem_expected) {
             esc.unexpected_telem++;
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("unexpected telemetry");
 #endif
             return;
@@ -492,7 +492,7 @@ void AP_FETtecOneWire::read_data_from_uart()
         if (crc8_dvb_update(0, u.receive_buf, frame_length-1) != u.receive_buf[frame_length-1]) {
             // bad message; shift away this frame_source byte to try to find
             // another message
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             AP_HAL::panic("bad message");
 #endif
             crc_rec_err_cnt++;

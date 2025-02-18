@@ -29,7 +29,7 @@
 
 class I2CBus;
 
-class EXTERNALFC::I2CDevice : public AP_HAL::I2CDevice {
+class HALEXTERNALFC::I2CDevice : public AP_HAL::I2CDevice {
 public:
     static I2CDevice *from(AP_HAL::I2CDevice *dev) {
         return static_cast<I2CDevice*>(dev);
@@ -103,7 +103,7 @@ protected:
                    uint8_t *recv, uint32_t recv_len);
 };
 
-class EXTERNALFC::I2CDeviceManager : public AP_HAL::I2CDeviceManager {
+class HALEXTERNALFC::I2CDeviceManager : public AP_HAL::I2CDeviceManager {
 public:
     friend class I2CDevice;
 

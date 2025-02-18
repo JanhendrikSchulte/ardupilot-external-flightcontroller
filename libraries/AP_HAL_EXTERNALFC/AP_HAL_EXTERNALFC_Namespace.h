@@ -1,6 +1,6 @@
 #pragma once
 
-namespace EXTERNALFC {
+namespace HALEXTERNALFC {
 class UARTDriver;
 class Scheduler;
 class SITL_State_Common;
@@ -20,4 +20,4 @@ class GPIO;
 class DigitalSource;
 class DSP;
 class CANIface;
-}  // namespace EXTERNALFC
+}  // namespace HALEXTERNALFC

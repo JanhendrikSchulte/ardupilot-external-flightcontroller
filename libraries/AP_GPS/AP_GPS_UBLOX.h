@@ -138,7 +138,8 @@ public:
     static bool _detect(struct UBLOX_detect_state &state, uint8_t data);
 
     bool is_configured(void) const override {
-#if CONFIG_HAL_BOARD != HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD != HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         if (!gps._auto_config) {
             return true;
         } else {

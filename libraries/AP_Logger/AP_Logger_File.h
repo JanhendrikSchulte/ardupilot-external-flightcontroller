@@ -50,7 +50,7 @@ public:
     void start_new_log(void) override;
     uint16_t find_oldest_log() override;
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     void flush(void) override;
 #endif
     void periodic_1Hz() override;

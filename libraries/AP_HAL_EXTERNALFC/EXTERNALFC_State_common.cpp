@@ -22,23 +22,23 @@
 
 extern const AP_HAL::HAL& hal;
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 #define streq(a, b) (!strcmp(a, b))
-SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const char *arg, const uint8_t portNumber)
+EXTERNALFC::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const char *arg, const uint8_t portNumber)
 {
     if (streq(name, "benewake_tf02")) {
         if (benewake_tf02 != nullptr) {
             AP_HAL::panic("Only one benewake_tf02 at a time");
         }
-        benewake_tf02 = NEW_NOTHROW SITL::RF_Benewake_TF02();
+        benewake_tf02 = NEW_NOTHROW EXTERNALFC::RF_Benewake_TF02();
         return benewake_tf02;
 #if !defined(HAL_BUILD_AP_PERIPH)
     } else if (streq(name, "vicon")) {
         if (vicon != nullptr) {
             AP_HAL::panic("Only one vicon system at a time");
         }
-        vicon = NEW_NOTHROW SITL::Vicon();
+        vicon = NEW_NOTHROW EXTERNALFC::Vicon();
         return vicon;
 #endif
 #if HAL_SIM_ADSB_ENABLED
@@ -47,7 +47,7 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         // will cope with begin() being called multiple times on a
         // serial port
         if (adsb == nullptr) {
-            adsb = NEW_NOTHROW SITL::ADSB();
+            adsb = NEW_NOTHROW EXTERNALFC::ADSB();
         }
         sitl_model->set_adsb(adsb);
         return adsb;
@@ -56,97 +56,97 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         if (ainsteinlrd1 != nullptr) {
             AP_HAL::panic("Only one ainsteinlrd1 at a time");
         }
-        ainsteinlrd1 = NEW_NOTHROW SITL::RF_Ainstein_LR_D1();
+        ainsteinlrd1 = NEW_NOTHROW EXTERNALFC::RF_Ainstein_LR_D1();
         return ainsteinlrd1;   
     } else if (streq(name, "benewake_tf03")) {
         if (benewake_tf03 != nullptr) {
             AP_HAL::panic("Only one benewake_tf03 at a time");
         }
-        benewake_tf03 = NEW_NOTHROW SITL::RF_Benewake_TF03();
+        benewake_tf03 = NEW_NOTHROW EXTERNALFC::RF_Benewake_TF03();
         return benewake_tf03;
     } else if (streq(name, "benewake_tfmini")) {
         if (benewake_tfmini != nullptr) {
             AP_HAL::panic("Only one benewake_tfmini at a time");
         }
-        benewake_tfmini = NEW_NOTHROW SITL::RF_Benewake_TFmini();
+        benewake_tfmini = NEW_NOTHROW EXTERNALFC::RF_Benewake_TFmini();
         return benewake_tfmini;
     } else if (streq(name, "nooploop_tofsense")) {
         if (nooploop != nullptr) {
             AP_HAL::panic("Only one nooploop_tofsense at a time");
         }
-        nooploop = NEW_NOTHROW SITL::RF_Nooploop();
+        nooploop = NEW_NOTHROW EXTERNALFC::RF_Nooploop();
         return nooploop;
     } else if (streq(name, "teraranger_serial")) {
         if (teraranger_serial != nullptr) {
             AP_HAL::panic("Only one teraranger_serial at a time");
         }
-        teraranger_serial = NEW_NOTHROW SITL::RF_TeraRanger_Serial();
+        teraranger_serial = NEW_NOTHROW EXTERNALFC::RF_TeraRanger_Serial();
         return teraranger_serial;
     } else if (streq(name, "lightwareserial")) {
         if (lightwareserial != nullptr) {
             AP_HAL::panic("Only one lightwareserial at a time");
         }
-        lightwareserial = NEW_NOTHROW SITL::RF_LightWareSerial();
+        lightwareserial = NEW_NOTHROW EXTERNALFC::RF_LightWareSerial();
         return lightwareserial;
     } else if (streq(name, "lightwareserial-binary")) {
         if (lightwareserial_binary != nullptr) {
             AP_HAL::panic("Only one lightwareserial-binary at a time");
         }
-        lightwareserial_binary = NEW_NOTHROW SITL::RF_LightWareSerialBinary();
+        lightwareserial_binary = NEW_NOTHROW EXTERNALFC::RF_LightWareSerialBinary();
         return lightwareserial_binary;
     } else if (streq(name, "lanbao")) {
         if (lanbao != nullptr) {
             AP_HAL::panic("Only one lanbao at a time");
         }
-        lanbao = NEW_NOTHROW SITL::RF_Lanbao();
+        lanbao = NEW_NOTHROW EXTERNALFC::RF_Lanbao();
         return lanbao;
     } else if (streq(name, "blping")) {
         if (blping != nullptr) {
             AP_HAL::panic("Only one blping at a time");
         }
-        blping = NEW_NOTHROW SITL::RF_BLping();
+        blping = NEW_NOTHROW EXTERNALFC::RF_BLping();
         return blping;
     } else if (streq(name, "leddarone")) {
         if (leddarone != nullptr) {
             AP_HAL::panic("Only one leddarone at a time");
         }
-        leddarone = NEW_NOTHROW SITL::RF_LeddarOne();
+        leddarone = NEW_NOTHROW EXTERNALFC::RF_LeddarOne();
         return leddarone;
     } else if (streq(name, "rds02uf")) {
         if (rds02uf != nullptr) {
             AP_HAL::panic("Only one rds02uf at a time");
         }
-        rds02uf = NEW_NOTHROW SITL::RF_RDS02UF();
+        rds02uf = NEW_NOTHROW EXTERNALFC::RF_RDS02UF();
         return rds02uf;
     } else if (streq(name, "USD1_v0")) {
         if (USD1_v0 != nullptr) {
             AP_HAL::panic("Only one USD1_v0 at a time");
         }
-        USD1_v0 = NEW_NOTHROW SITL::RF_USD1_v0();
+        USD1_v0 = NEW_NOTHROW EXTERNALFC::RF_USD1_v0();
         return USD1_v0;
     } else if (streq(name, "USD1_v1")) {
         if (USD1_v1 != nullptr) {
             AP_HAL::panic("Only one USD1_v1 at a time");
         }
-        USD1_v1 = NEW_NOTHROW SITL::RF_USD1_v1();
+        USD1_v1 = NEW_NOTHROW EXTERNALFC::RF_USD1_v1();
         return USD1_v1;
     } else if (streq(name, "maxsonarseriallv")) {
         if (maxsonarseriallv != nullptr) {
             AP_HAL::panic("Only one maxsonarseriallv at a time");
         }
-        maxsonarseriallv = NEW_NOTHROW SITL::RF_MaxsonarSerialLV();
+        maxsonarseriallv = NEW_NOTHROW EXTERNALFC::RF_MaxsonarSerialLV();
         return maxsonarseriallv;
     } else if (streq(name, "wasp")) {
         if (wasp != nullptr) {
             AP_HAL::panic("Only one wasp at a time");
         }
-        wasp = NEW_NOTHROW SITL::RF_Wasp();
+        wasp = NEW_NOTHROW EXTERNALFC::RF_Wasp();
         return wasp;
     } else if (streq(name, "nmea")) {
         if (nmea != nullptr) {
             AP_HAL::panic("Only one nmea at a time");
         }
-        nmea = NEW_NOTHROW SITL::RF_NMEA();
+        nmea = NEW_NOTHROW EXTERNALFC::RF_NMEA();
         return nmea;
 
 #if !defined(HAL_BUILD_AP_PERIPH)
@@ -154,34 +154,34 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         if (rf_mavlink != nullptr) {
             AP_HAL::panic("Only one rf_mavlink at a time");
         }
-        rf_mavlink = NEW_NOTHROW SITL::RF_MAVLink();
+        rf_mavlink = NEW_NOTHROW EXTERNALFC::RF_MAVLink();
         return rf_mavlink;
 #endif
     } else if (streq(name, "frsky-d")) {
         if (frsky_d != nullptr) {
             AP_HAL::panic("Only one frsky_d at a time");
         }
-        frsky_d = NEW_NOTHROW SITL::Frsky_D();
+        frsky_d = NEW_NOTHROW EXTERNALFC::Frsky_D();
         return frsky_d;
     // } else if (streq(name, "frsky-SPort")) {
     //     if (frsky_sport != nullptr) {
     //         AP_HAL::panic("Only one frsky_sport at a time");
     //     }
-    //     frsky_sport = NEW_NOTHROW SITL::Frsky_SPort();
+    //     frsky_sport = NEW_NOTHROW EXTERNALFC::Frsky_SPort();
     //     return frsky_sport;
 
     // } else if (streq(name, "frsky-SPortPassthrough")) {
     //     if (frsky_sport_passthrough != nullptr) {
     //         AP_HAL::panic("Only one frsky_sport passthrough at a time");
     //     }
-    //     frsky_sport = NEW_NOTHROW SITL::Frsky_SPortPassthrough();
+    //     frsky_sport = NEW_NOTHROW EXTERNALFC::Frsky_SPortPassthrough();
     //     return frsky_sportpassthrough;
 #if AP_SIM_CRSF_ENABLED
     } else if (streq(name, "crsf")) {
         if (crsf != nullptr) {
             AP_HAL::panic("Only one crsf at a time");
         }
-        crsf = NEW_NOTHROW SITL::CRSF();
+        crsf = NEW_NOTHROW EXTERNALFC::CRSF();
         return crsf;
 #endif
 #if HAL_SIM_PS_RPLIDARA2_ENABLED
@@ -189,7 +189,7 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         if (rplidara2 != nullptr) {
             AP_HAL::panic("Only one rplidara2 at a time");
         }
-        rplidara2 = NEW_NOTHROW SITL::PS_RPLidarA2();
+        rplidara2 = NEW_NOTHROW EXTERNALFC::PS_RPLidarA2();
         return rplidara2;
 #endif
 #if HAL_SIM_PS_RPLIDARA1_ENABLED
@@ -197,7 +197,7 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         if (rplidara1 != nullptr) {
             AP_HAL::panic("Only one rplidara1 at a time");
         }
-        rplidara1 = NEW_NOTHROW SITL::PS_RPLidarA1();
+        rplidara1 = NEW_NOTHROW EXTERNALFC::PS_RPLidarA1();
         return rplidara1;
 #endif
 #if HAL_SIM_PS_TERARANGERTOWER_ENABLED
@@ -205,7 +205,7 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         if (terarangertower != nullptr) {
             AP_HAL::panic("Only one terarangertower at a time");
         }
-        terarangertower = NEW_NOTHROW SITL::PS_TeraRangerTower();
+        terarangertower = NEW_NOTHROW EXTERNALFC::PS_TeraRangerTower();
         return terarangertower;
 #endif
 #if HAL_SIM_PS_LIGHTWARE_SF45B_ENABLED
@@ -213,7 +213,7 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         if (sf45b != nullptr) {
             AP_HAL::panic("Only one sf45b at a time");
         }
-        sf45b = NEW_NOTHROW SITL::PS_LightWare_SF45B();
+        sf45b = NEW_NOTHROW EXTERNALFC::PS_LightWare_SF45B();
         return sf45b;
 #endif
 #if AP_SIM_ADSB_SAGETECH_MXS_ENABLED
@@ -221,9 +221,9 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         if (sagetech_mxs != nullptr) {
             AP_HAL::panic("Only one sagetech_mxs at a time");
         }
-        sagetech_mxs = NEW_NOTHROW SITL::ADSB_Sagetech_MXS();
+        sagetech_mxs = NEW_NOTHROW EXTERNALFC::ADSB_Sagetech_MXS();
         if (adsb == nullptr) {
-            adsb = NEW_NOTHROW SITL::ADSB();
+            adsb = NEW_NOTHROW EXTERNALFC::ADSB();
         }
         sitl_model->set_adsb(adsb);
         return sagetech_mxs;
@@ -248,51 +248,51 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         if (jre != nullptr) {
             AP_HAL::panic("Only one jre at a time");
         }
-        jre = NEW_NOTHROW SITL::RF_JRE();
+        jre = NEW_NOTHROW EXTERNALFC::RF_JRE();
         return jre;
     } else if (streq(name, "gyus42v2")) {
         if (gyus42v2 != nullptr) {
             AP_HAL::panic("Only one gyus42v2 at a time");
         }
-        gyus42v2 = NEW_NOTHROW SITL::RF_GYUS42v2();
+        gyus42v2 = NEW_NOTHROW EXTERNALFC::RF_GYUS42v2();
         return gyus42v2;
     } else if (streq(name, "megasquirt")) {
         if (efi_ms != nullptr) {
             AP_HAL::panic("Only one megasquirt at a time");
         }
-        efi_ms = NEW_NOTHROW SITL::EFI_MegaSquirt();
+        efi_ms = NEW_NOTHROW EXTERNALFC::EFI_MegaSquirt();
         return efi_ms;
     } else if (streq(name, "hirth")) {
         if (efi_hirth != nullptr) {
             AP_HAL::panic("Only one hirth at a time");
         }
-        efi_hirth = NEW_NOTHROW SITL::EFI_Hirth();
+        efi_hirth = NEW_NOTHROW EXTERNALFC::EFI_Hirth();
         return efi_hirth;
     } else if (streq(name, "VectorNav")) {
         if (vectornav != nullptr) {
             AP_HAL::panic("Only one VectorNav at a time");
         }
-        vectornav = NEW_NOTHROW SITL::VectorNav();
+        vectornav = NEW_NOTHROW EXTERNALFC::VectorNav();
         return vectornav;
     } else if (streq(name, "MicroStrain5")) {
         if (microstrain5 != nullptr) {
             AP_HAL::panic("Only one MicroStrain5 at a time");
         }
-        microstrain5 = NEW_NOTHROW SITL::MicroStrain5();
+        microstrain5 = NEW_NOTHROW EXTERNALFC::MicroStrain5();
         return microstrain5;
 
     } else if (streq(name, "MicroStrain7")) {
         if (microstrain7 != nullptr) {
             AP_HAL::panic("Only one MicroStrain7 at a time");
         }
-        microstrain7 = NEW_NOTHROW SITL::MicroStrain7();
+        microstrain7 = NEW_NOTHROW EXTERNALFC::MicroStrain7();
         return microstrain7;
 
     } else if (streq(name, "ILabs")) {
         if (inertiallabs != nullptr) {
             AP_HAL::panic("Only one InertialLabs INS at a time");
         }
-        inertiallabs = NEW_NOTHROW SITL::InertialLabs();
+        inertiallabs = NEW_NOTHROW EXTERNALFC::InertialLabs();
         return inertiallabs;
 
 #if HAL_SIM_AIS_ENABLED
@@ -300,7 +300,7 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         if (ais != nullptr) {
             AP_HAL::panic("Only one AIS at a time");
         }
-        ais = NEW_NOTHROW SITL::AIS();
+        ais = NEW_NOTHROW EXTERNALFC::AIS();
         return ais;
 #endif
     } else if (strncmp(name, "gps", 3) == 0) {
@@ -308,13 +308,13 @@ SITL::SerialDevice *SITL_State_Common::create_serial_sim(const char *name, const
         if (x <= 0 || x > ARRAY_SIZE(gps)) {
             AP_HAL::panic("Bad GPS number %u (%s)", x, arg);
         }
-        gps[x-1] = NEW_NOTHROW SITL::GPS(x-1);
+        gps[x-1] = NEW_NOTHROW EXTERNALFC::GPS(x-1);
         return gps[x-1];
     } else if (streq(name, "ELRS")) {
         // Only allocate if not done already
         // MAVLink serial ports have begin called several times
         if (elrs == nullptr) {
-            elrs = NEW_NOTHROW SITL::ELRS(portNumber, this);
+            elrs = NEW_NOTHROW EXTERNALFC::ELRS(portNumber, this);
             _sitl->set_stop_MAVLink_sim_state();
         }
         return elrs;

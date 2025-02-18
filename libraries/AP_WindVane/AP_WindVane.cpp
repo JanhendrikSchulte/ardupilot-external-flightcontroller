@@ -165,7 +165,7 @@ const AP_Param::GroupInfo AP_WindVane::var_info[] = {
 AP_WindVane::AP_WindVane()
 {
     AP_Param::setup_object_defaults(this, var_info);
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton) {
         AP_HAL::panic("Too many Wind Vane sensors");
     }

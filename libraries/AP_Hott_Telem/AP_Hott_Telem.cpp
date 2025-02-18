@@ -52,7 +52,7 @@ AP_Hott_Telem *AP_Hott_Telem::singleton;
 
 AP_Hott_Telem::AP_Hott_Telem(void)
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (singleton != nullptr) {
         AP_HAL::panic("AP_Hott_Telem must be singleton");
     }

@@ -6,7 +6,12 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
+// TODO-TBC
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <SITL/SITL.h>
+#elif CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include <EXTERNALFC/EXTERNALFC.h>
+#endif
 
 #if AP_RCPROTOCOL_FDM_ENABLED
 #include "AP_RCProtocol_FDM.h"
@@ -78,7 +83,7 @@ void AP_RCProtocol_UDP::update()
     }
 
     read_all_socket_input();
-
+// TODO-TBC
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     const auto sitl = AP::sitl();
     if (sitl == nullptr) {
@@ -86,6 +91,16 @@ void AP_RCProtocol_UDP::update()
     }
 
     if (sitl->rc_fail == SITL::SIM::SITL_RCFail_NoPulses) {
+        return;
+    }
+#endif
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+    const auto sitl = AP::sitl();
+    if (sitl == nullptr) {
+        return;
+    }
+
+    if (sitl->rc_fail == EXTERNALFC::SIM::SITL_RCFail_NoPulses) {
         return;
     }
 #endif
@@ -137,7 +152,7 @@ void AP_RCProtocol_UDP::read_all_socket_input(void)
     if (count > 100) {
         ::fprintf(stderr, "Read %u rc inputs\n", count);
     }
-
+// TODO-TBU
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     const auto sitl = AP::sitl();
     if (sitl == nullptr) {
@@ -158,6 +173,29 @@ void AP_RCProtocol_UDP::read_all_socket_input(void)
         // see also code in ::update
         return;
     case SITL::SIM::SITL_RCFail_None:
+        break;
+    }
+#endif
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+    const auto sitl = AP::sitl();
+    if (sitl == nullptr) {
+        return;
+    }
+
+    // convert last packet received into pwm values
+    switch (sitl->rc_fail) {
+    case EXTERNALFC::SIM::SITL_RCFail_Throttle950:
+        // discard anything we just read from the "receiver" and set
+        // values to bind values:
+        for (uint8_t i=0; i<ARRAY_SIZE(pwm_input); i++) {
+            pwm_input[i] = 1500;  // centre all inputs
+        }
+        pwm_input[2] = 950;  // reset throttle (assumed to be on channel 3...)
+        return;
+    case EXTERNALFC::SIM::SITL_RCFail_NoPulses:
+        // see also code in ::update
+        return;
+    case EXTERNALFC::SIM::SITL_RCFail_None:
         break;
     }
 #endif

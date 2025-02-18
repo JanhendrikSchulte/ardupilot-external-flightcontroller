@@ -35,6 +35,9 @@
 #elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <AP_HAL_SITL/CANSocketIface.h>
 #include <AP_HAL_SITL/AP_HAL_SITL.h>
+#elif CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include <AP_HAL_EXTERNALFC/CANSocketIface.h>
+#include <AP_HAL_EXTERNALFC/AP_HAL_EXTERNALFC.h>
 #endif
 
 #define IFACE_ALL ((1U<<(HAL_NUM_CAN_IFACES))-1U)
@@ -45,8 +48,8 @@
 #if HAL_NUM_CAN_IFACES >= 2
 #include <AP_CANManager/AP_CANSensor.h>
 #endif
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU everything with externalfc
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 extern const HAL_SITL &hal;
 #else
 extern const AP_HAL::HAL &hal;
@@ -88,7 +91,7 @@ static struct instance_t {
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
     AP_HAL::CANIface* iface;
-#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     HALSITL::CANIface* iface;
 #endif
 
@@ -137,7 +140,7 @@ uint8_t user_set_node_id = HAL_CAN_DEFAULT_NODE_ID;
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
 ChibiOS::CANIface* AP_Periph_FW::can_iface_periph[HAL_NUM_CAN_IFACES];
-#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 HALSITL::CANIface* AP_Periph_FW::can_iface_periph[HAL_NUM_CAN_IFACES];
 #endif
 
@@ -803,7 +806,7 @@ void AP_Periph_FW::onTransferReceived(CanardInstance* canard_instance,
         prepare_reboot();
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
         NVIC_SystemReset();
-#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         HAL_SITL::actually_reboot();
 #endif
         break;
@@ -1498,7 +1501,7 @@ void AP_Periph_FW::process1HzTasks(uint64_t timestamp_usec)
     }
 #endif
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (hal.run_in_maintenance_mode()) {
         node_status.mode = UAVCAN_PROTOCOL_NODESTATUS_MODE_MAINTENANCE;
     } else
@@ -1621,7 +1624,7 @@ void AP_Periph_FW::can_start()
     for (uint8_t i=0; i<HAL_NUM_CAN_IFACES; i++) {
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
         can_iface_periph[i] = NEW_NOTHROW ChibiOS::CANIface();
-#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         can_iface_periph[i] = NEW_NOTHROW HALSITL::CANIface();
 #endif
         instances[i].iface = can_iface_periph[i];
@@ -1869,8 +1872,8 @@ void AP_Periph_FW::can_update()
         last_1Hz_ms = now;
         process1HzTasks(AP_HAL::micros64());
     }
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (!hal.run_in_maintenance_mode())
 #endif
     {

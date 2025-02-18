@@ -24,7 +24,7 @@
 #include <AP_Terrain/AP_Terrain.h>
 #include <AP_HAL/utility/Socket_native.h>
 
-class SimMCast : public SITL::Aircraft {
+class SimMCast : public EXTERNALFC::Aircraft {
 public:
     SimMCast(const char *frame_str);
     void update(const struct sitl_input &input) override;
@@ -45,10 +45,10 @@ private:
 
 class HAL_SITL;
 
-class EXTERNALFC::SITL_State : public SITL_State_Common {
-    friend class EXTERNALFC::Scheduler;
-    friend class EXTERNALFC::Util;
-    friend class EXTERNALFC::GPIO;
+class HALEXTERNALFC::SITL_State : public SITL_State_Common {
+    friend class HALEXTERNALFC::Scheduler;
+    friend class HALEXTERNALFC::Util;
+    friend class HALEXTERNALFC::GPIO;
 public:
     void init(int argc, char * const argv[]) override;
 
@@ -89,7 +89,7 @@ private:
     bool _maintenance;
 
     // simulated GPS devices
-    SITL::GPS *gps[1];  // constrained by # of parameter sets
+    EXTERNALFC::GPS *gps[1];  // constrained by # of parameter sets
 };
 
 #endif

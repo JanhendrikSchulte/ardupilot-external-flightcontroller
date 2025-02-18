@@ -5,7 +5,7 @@ import platform
 
 def configure(cfg):
 
-    if not cfg.env.BOARD_CLASS in ['SITL', 'LINUX', 'ChibiOS']:
+    if not cfg.env.BOARD_CLASS in ['SITL', 'LINUX', 'ChibiOS', 'EXTERNALFC']:
         return
 
     # networking doesn't build with clang unless using macOS

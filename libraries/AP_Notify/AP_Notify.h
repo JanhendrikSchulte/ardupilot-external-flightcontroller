@@ -226,8 +226,8 @@ public:
     uint8_t get_led_len() const { return _led_len; }
     uint32_t get_led_type() const { return _led_type; }
     int8_t get_rgb_led_brightness_percent() const;
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     HAL_Semaphore sf_window_mutex;
 #endif
 

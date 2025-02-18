@@ -32,6 +32,8 @@
 #include <GCS_MAVLink/GCS.h>
 #if CONFIG_HAL_BOARD == HAL_BOARD_LINUX
 #include <AP_HAL_Linux/CANSocketIface.h>
+#elif CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include <AP_HAL_EXTERNALFC/CANSocketIface.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <AP_HAL_SITL/CANSocketIface.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
@@ -131,7 +133,7 @@ void AP_CANManager::init()
     // we need to mutate the HAL to install new CAN interfaces
     AP_HAL::HAL& hal_mutable = AP_HAL::get_HAL_mutable();
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (AP::sitl() == nullptr) {
         AP_HAL::panic("CANManager: SITL not initialised!");
     }

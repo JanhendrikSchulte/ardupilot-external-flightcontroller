@@ -348,7 +348,7 @@ bool Display::init(void)
         case DISPLAY_SITL: {
 #ifdef WITH_SITL_OSD
             _driver = Display_SITL::probe(); // never fails
-#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             ::fprintf(stderr, "SITL Display ineffective without --osd\n");
 #endif
             break;

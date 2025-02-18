@@ -50,7 +50,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 bool UARTDriver::_console;
 
@@ -256,7 +256,7 @@ void UARTDriver::_flush(void)
     // ensure that the outbound TCP queue is also empty...
     start_ms = AP_HAL::millis();
     while (AP_HAL::millis() - start_ms < 1000) {
-        if (((EXTERNALFC::UARTDriver*)hal.serial(0))->get_system_outqueue_length() == 0) {
+        if (((HALEXTERNALFC::UARTDriver*)hal.serial(0))->get_system_outqueue_length() == 0) {
             break;
         }
         usleep(1000);
@@ -278,7 +278,7 @@ size_t UARTDriver::_write(const uint8_t *buffer, size_t size)
          */
         uint8_t lost_byte = 0;
 #if !defined(HAL_BUILD_AP_PERIPH)
-        SITL::SIM *_sitl = AP::sitl();
+        EXTERNALFC::SIM *_sitl = AP::sitl();
 
         if (_sitl && _sitl->uart_byte_loss_pct > 0) {
             if (fabsf(rand_float()) < _sitl->uart_byte_loss_pct.get() * 0.01 * size) {
@@ -827,7 +827,7 @@ void UARTDriver::handle_writing_from_writebuffer_to_device()
     ssize_t nwritten;
     uint32_t max_bytes = 10000;
 #if !defined(HAL_BUILD_AP_PERIPH)
-    SITL::SIM *_sitl = AP::sitl();
+    EXTERNALFC::SIM *_sitl = AP::sitl();
     if (_sitl && _sitl->telem_baudlimit_enable) {
         // limit byte rate to configured baudrate
         // Byte rate is bit rate divided by 10. 8 bits of data + start/stop bits
@@ -894,7 +894,7 @@ void UARTDriver::handle_reading_from_device_to_readbuffer()
 
     uint32_t max_bytes = 10000;
 #if !defined(HAL_BUILD_AP_PERIPH)
-    SITL::SIM *_sitl = AP::sitl();
+    EXTERNALFC::SIM *_sitl = AP::sitl();
     if (_sitl && _sitl->telem_baudlimit_enable) {
         // limit byte rate to configured baudrate
         // Byte rate is bit rate divided by 10. 8 bits of data + start/stop bits
@@ -1029,7 +1029,7 @@ uint32_t UARTDriver::bw_in_bytes_per_second() const
     // if connected, assume at least a 10/100Mbps connection if not limited
     bool baud_limit = false;
 #if !defined(HAL_BUILD_AP_PERIPH)
-    SITL::SIM *_sitl = AP::sitl();
+    EXTERNALFC::SIM *_sitl = AP::sitl();
     baud_limit = (_sitl != nullptr) && _sitl->telem_baudlimit_enable;
 #endif
     const uint32_t bitrate = (_connected && !baud_limit) ? 10E6 : _uart_baudrate;

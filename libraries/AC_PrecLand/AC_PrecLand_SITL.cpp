@@ -1,7 +1,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include "AC_PrecLand_SITL.h"
 
-#if AC_PRECLAND_SITL_ENABLED
+#if AC_PRECLAND_SITL_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include "AP_AHRS/AP_AHRS.h"
 // init - perform initialisation of this backend

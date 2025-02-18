@@ -9,8 +9,13 @@
 #include "AC_PrecLand_Backend.h"
 #include "AC_PrecLand_Companion.h"
 #include "AC_PrecLand_IRLock.h"
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AC_PrecLand_EXTERNALFC_Gazebo.h"
+#include "AC_PrecLand_EXTERNALFC.h"
+#else
 #include "AC_PrecLand_SITL_Gazebo.h"
 #include "AC_PrecLand_SITL.h"
+#endif
 #include <AP_Logger/AP_Logger.h>
 #include <GCS_MAVLink/GCS.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>

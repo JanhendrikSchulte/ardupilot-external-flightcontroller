@@ -3,7 +3,7 @@
 #include "AP_HAL_EXTERNALFC.h"
 #if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 
-class EXTERNALFC::GPIO : public AP_HAL::GPIO {
+class HALEXTERNALFC::GPIO : public AP_HAL::GPIO {
 public:
     explicit GPIO(SITL_State *sitlState): _sitlState(sitlState) {}
     void init() override;
@@ -26,7 +26,7 @@ private:
     uint8_t pin_mode_is_write;
 };
 
-class EXTERNALFC::DigitalSource : public AP_HAL::DigitalSource {
+class HALEXTERNALFC::DigitalSource : public AP_HAL::DigitalSource {
 public:
     explicit DigitalSource(uint8_t pin);
     void mode(uint8_t output) override;

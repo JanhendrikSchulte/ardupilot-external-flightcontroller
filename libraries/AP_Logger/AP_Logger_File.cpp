@@ -875,7 +875,7 @@ bool AP_Logger_File::write_lastlog_file(uint16_t log_num)
     return written == to_write;
 }
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 void AP_Logger_File::flush(void)
 #if APM_BUILD_TYPE(APM_BUILD_Replay) || APM_BUILD_TYPE(APM_BUILD_UNKNOWN)
 {
@@ -1005,7 +1005,8 @@ void AP_Logger_File::io_timer(void)
           chunk, ensuring the directory entry is updated after each
           write.
          */
-#if CONFIG_HAL_BOARD != HAL_BOARD_SITL && CONFIG_HAL_BOARD_SUBTYPE != HAL_BOARD_SUBTYPE_LINUX_NONE
+// TODO-TBU
+#if (CONFIG_HAL_BOARD != HAL_BOARD_SITL && CONFIG_HAL_BOARD != HAL_BOARD_EXTERNALFC) && CONFIG_HAL_BOARD_SUBTYPE != HAL_BOARD_SUBTYPE_LINUX_NONE
         last_io_operation = "fsync";
         AP::FS().fsync(_write_fd);
         last_io_operation = "";
@@ -1039,11 +1040,21 @@ bool AP_Logger_File::io_thread_alive() const
 #else
     uint32_t timeout_ms = 5000;
 #endif
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL && !defined(HAL_BUILD_AP_PERIPH)
+// TODO-TBU
+#if (CONFIG_HAL_BOARD == HAL_BOARD_SITL) && !defined(HAL_BUILD_AP_PERIPH)
     // the IO thread is working with hardware - writing to a physical
     // disk.  Unfortunately these hardware devices do not obey our
     // SITL speedup options, so we allow for it here.
     SITL::SIM *sitl = AP::sitl();
+    if (sitl != nullptr) {
+        timeout_ms *= sitl->speedup;
+    }
+#endif
+#if (CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC) && !defined(HAL_BUILD_AP_PERIPH)
+    // the IO thread is working with hardware - writing to a physical
+    // disk.  Unfortunately these hardware devices do not obey our
+    // SITL speedup options, so we allow for it here.
+    EXTERNALFC::SIM *sitl = AP::sitl();
     if (sitl != nullptr) {
         timeout_ms *= sitl->speedup;
     }

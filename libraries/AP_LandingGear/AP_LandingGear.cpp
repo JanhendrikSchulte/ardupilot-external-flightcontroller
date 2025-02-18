@@ -11,6 +11,10 @@
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <SITL/SITL.h>
 #endif
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include <EXTERNALFC/EXTERNALFC.h>
+#endif
+
 
 #if defined(APM_BUILD_TYPE)
 //  - this is just here to encourage the build system to supply the "legacy build defines".  The actual dependecy is in the AP_LandingGear.h and AP_LandingGear_config.h headers
@@ -101,7 +105,8 @@ AP_LandingGear *AP_LandingGear::_singleton;
 /// initialise state of landing gear
 void AP_LandingGear::init()
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (AP::sitl()->wow_pin > 0) {
         _pin_weight_on_wheels.set_and_default(AP::sitl()->wow_pin);
         _pin_weight_on_wheels_polarity.set_and_default(1);

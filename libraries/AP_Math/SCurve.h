@@ -175,7 +175,7 @@ private:
     // return true if the curve is valid.  Used to identify and protect against code errors
     bool valid() const WARN_IF_UNUSED;
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // debugging messages
     void debug() const;
 #endif

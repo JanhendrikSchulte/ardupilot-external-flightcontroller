@@ -23,7 +23,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
     enum long_options {
         CMDLINE_SERIAL0=1,
@@ -193,7 +193,7 @@ void SimMCast::multicast_read(void)
     if (_sitl->state.timestamp_us == 0) {
         printf("Waiting for multicast state\n");
     }
-    struct SITL::sitl_fdm state;
+    struct EXTERNALFC::sitl_fdm state;
     while (sock.recv((void*)&state, sizeof(state), 1) != sizeof(state)) {
         // nop
     }
@@ -213,7 +213,7 @@ void SimMCast::multicast_read(void)
         home = location;
     }
     hal.scheduler->stop_clock(_sitl->state.timestamp_us + base_time_us);
-    EXTERNALFC::Scheduler::timer_event();
+    HALEXTERNALFC::Scheduler::timer_event();
     if (!servo_sock.is_connected()) {
         servo_fd_open();
     } else {

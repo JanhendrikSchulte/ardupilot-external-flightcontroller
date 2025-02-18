@@ -81,9 +81,11 @@
 #include <AP_Radio/AP_Radio.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #endif
-
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <SITL/SITL.h>
+#endif
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include <EXTERNALFC/EXTERNALFC.h>
 #endif
 
 #if HAL_MAX_CAN_PROTOCOL_DRIVERS
@@ -1286,7 +1288,7 @@ ap_message GCS_MAVLINK::next_deferred_bucket_message_to_send(uint16_t now16_ms)
     const int16_t next = bucket_message_ids_to_send.first_set();
     if (next == -1) {
         // should not happen
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("next_deferred_bucket_message_to_send called on empty bucket");
 #endif
         find_next_bucket_to_send(now16_ms);
@@ -1650,7 +1652,8 @@ void GCS_MAVLINK::remove_message_from_bucket(int8_t bucket, ap_message id)
         if (bucket_message_ids_to_send.count() == 0) {
             find_next_bucket_to_send(AP_HAL::millis16());
         } else {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             if (deferred_message_bucket[bucket].interval_ms == 0 &&
                 deferred_message_bucket[bucket].last_sent_ms == 0) {
                 // we just freed this bucket!  this would mean that
@@ -1700,7 +1703,7 @@ bool GCS_MAVLINK::set_ap_message_interval(enum ap_message id, uint16_t interval_
             if (empty_bucket_id == -1) {
                 empty_bucket_id = i;
             }
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             if (bucket.ap_message_ids.count() != 0) {
                 AP_HAL::panic("Bucket %u has zero interval but with ids set", i);
             }
@@ -1743,7 +1746,7 @@ bool GCS_MAVLINK::set_ap_message_interval(enum ap_message id, uint16_t interval_
 
     if (closest_bucket == -1 && empty_bucket_id == -1) {
         // gah?!
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         ::fprintf(stderr, "no buckets?!\n");
         abort();
 #endif
@@ -3519,8 +3522,8 @@ MAV_RESULT GCS_MAVLINK::handle_preflight_reboot(const mavlink_command_int_t &pac
         // param1 must be 1 or 3 - 1 being reboot, 3 being reboot-to-bootloader
         return MAV_RESULT_UNSUPPORTED;
     }
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     {  // autotest relies in receiving the ACK for the reboot.  Ensure
        // there is space for it:
         const uint32_t tstart_ms = AP_HAL::millis();
@@ -4628,8 +4631,25 @@ void GCS_MAVLINK::send_banner()
 #endif
 }
 
+#if AP_SIM_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+void GCS_MAVLINK::send_simstate() const
+{
+    EXTERNALFC::SIM *sitl = AP::sitl();
+    if (sitl == nullptr) {
+        return;
+    }
+    sitl->simstate_send(get_chan());
+}
 
-#if AP_SIM_ENABLED
+void GCS_MAVLINK::send_sim_state() const
+{
+    EXTERNALFC::SIM *sitl = AP::sitl();
+    if (sitl == nullptr) {
+        return;
+    }
+    sitl->sim_state_send(get_chan());
+}
+#elif AP_SIM_ENABLED
 void GCS_MAVLINK::send_simstate() const
 {
     SITL::SIM *sitl = AP::sitl();
@@ -6541,7 +6561,7 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
         // This message will be sent out at the same rate as the
         // unknown message, so should be safe.
         GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "Sending unknown message (%u)", id);
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Sending unknown ap_message %u", id);
 #endif
         break;
@@ -7031,7 +7051,7 @@ bool GCS_MAVLINK::mavlink_coordinate_frame_to_location_alt_frame(const MAV_FRAME
         frame = Location::AltFrame::ABSOLUTE;
         return true;
     default:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Unknown mavlink coordinate frame %u", coordinate_frame);
 #endif
         return false;

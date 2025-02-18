@@ -9,6 +9,9 @@
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
   #include <SITL/SITL.h>
 #endif
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+  #include <EXTERNALFC/EXTERNALFC.h>
+#endif
 
 extern const AP_HAL::HAL& hal;
 

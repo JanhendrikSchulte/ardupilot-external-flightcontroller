@@ -20,7 +20,7 @@
 #include <GCS_MAVLink/GCS.h>
 #include <AP_InternalError/AP_InternalError.h>
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #include <stdio.h>
 #endif
 

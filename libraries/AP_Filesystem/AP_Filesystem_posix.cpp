@@ -48,8 +48,8 @@ static const char *map_filename(const char *fname)
     asprintf(&fname2, "%s/%s", AP_FILESYSTEM_POSIX_MAP_FILENAME_BASEDIR, fname);
     return fname2;
 #else
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL && !APM_BUILD_TYPE(APM_BUILD_Replay)
+// TODO-TBU
+#if (CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC) && !APM_BUILD_TYPE(APM_BUILD_Replay)
     // on SITL only allow paths under subdirectory. Users can still
     // escape with .. if they want to
     if (strcmp(fname, "/") == 0) {

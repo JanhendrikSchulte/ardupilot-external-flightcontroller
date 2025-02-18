@@ -26,7 +26,7 @@
 #include <cmath>
 #include <assert.h>
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 extern const AP_HAL::HAL& hal;
 

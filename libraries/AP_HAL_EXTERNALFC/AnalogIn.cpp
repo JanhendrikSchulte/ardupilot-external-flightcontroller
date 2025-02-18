@@ -7,7 +7,7 @@
 
 #define VOLTAGE_TO_PIN_VALUE(_v) (constrain_float(_v * (SITL_ADC_MAX_PIN_VALUE/SITL_ADC_FULL_SCALE_VOLTAGE), 0, SITL_ADC_MAX_PIN_VALUE))
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 extern const AP_HAL::HAL& hal;
 

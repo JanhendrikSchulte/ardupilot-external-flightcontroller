@@ -27,7 +27,11 @@
 #include <AP_Math/AP_Math.h>
 #include <AP_MSP/msp.h>
 #include <AP_ExternalAHRS/AP_ExternalAHRS.h>
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include <EXTERNALFC/SIM_GPS.h>
+#else
 #include <SITL/SIM_GPS.h>
+#endif
 #include <GCS_MAVLink/GCS_MAVLink.h>
 
 #define GPS_UNKNOWN_DOP UINT16_MAX // set unknown DOP's to maximum value, which is also correct for MAVLink

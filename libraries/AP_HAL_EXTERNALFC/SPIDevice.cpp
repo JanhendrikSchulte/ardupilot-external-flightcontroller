@@ -24,7 +24,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 /*
  * SPIBus
@@ -66,7 +66,7 @@ uint8_t SPIBus::spi_buscount;
 // FIXME: do the whole subdev dance here and get an actual FD to do an ioctl on?
 int SPIBus::_ioctl(uint8_t cs_pin, uint8_t ioctl_number, void *data)
 {
-    SITL::SIM *sitl = AP::sitl();
+    EXTERNALFC::SIM *sitl = AP::sitl();
     return sitl->spi_ioctl(bus, cs_pin, ioctl_number, data);
 }
 

@@ -215,8 +215,8 @@ void AP_Logger::handle_log_send()
 void AP_Logger::handle_log_sending()
 {
     WITH_SEMAPHORE(_log_send_sem);
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBC
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // assume USB speeds in SITL for the purposes of log download
     const uint8_t num_sends = 40;
 #else

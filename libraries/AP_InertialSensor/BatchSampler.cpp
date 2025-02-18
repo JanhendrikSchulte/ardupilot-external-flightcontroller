@@ -165,7 +165,8 @@ void AP_InertialSensor::BatchSampler::rotate_to_next_sensor()
     }
     if (!haveinstance) {
         // should not happen!
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         abort();
 #endif
         instance = 0;

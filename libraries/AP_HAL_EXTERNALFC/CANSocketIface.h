@@ -28,7 +28,7 @@
 #include <poll.h>
 #include "CAN_Transport.h"
 
-namespace EXTERNALFC {
+namespace HALEXTERNALFC {
 
 class CANIface: public AP_HAL::CANIface {
 public:

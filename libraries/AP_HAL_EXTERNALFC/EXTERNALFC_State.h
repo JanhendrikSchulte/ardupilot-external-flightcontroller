@@ -13,10 +13,10 @@
 
 class HAL_SITL;
 
-class EXTERNALFC::SITL_State : public SITL_State_Common {
-    friend class EXTERNALFC::Scheduler;
-    friend class EXTERNALFC::Util;
-    friend class EXTERNALFC::GPIO;
+class HALEXTERNALFC::SITL_State : public SITL_State_Common {
+    friend class HALEXTERNALFC::Scheduler;
+    friend class HALEXTERNALFC::Util;
+    friend class HALEXTERNALFC::GPIO;
 public:
     void init(int argc, char * const argv[]) override;
 

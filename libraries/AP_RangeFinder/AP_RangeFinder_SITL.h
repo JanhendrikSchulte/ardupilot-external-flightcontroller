@@ -16,7 +16,7 @@
 
 #include "AP_RangeFinder_config.h"
 
-#if AP_RANGEFINDER_SIM_ENABLED
+#if AP_RANGEFINDER_SIM_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include "AP_RangeFinder_Backend.h"
 

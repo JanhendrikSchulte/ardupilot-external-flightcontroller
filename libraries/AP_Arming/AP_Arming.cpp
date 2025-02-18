@@ -318,7 +318,9 @@ bool AP_Arming::barometer_checks(bool report)
 #ifdef HAL_BARO_ALLOW_INIT_NO_BARO
     return true;
 #endif
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+
+// TODO-POI
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (AP::sitl()->baro_count == 0) {
         // simulate no baro boards
         return true;

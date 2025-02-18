@@ -116,7 +116,7 @@ void ModeAutorotate::run()
             // Entry phase functions to be run only once
             if (_flags.entry_initial == true) {
 
-                #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+                #if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
                     gcs().send_text(MAV_SEVERITY_INFO, "Entry Phase");
                 #endif
 
@@ -162,7 +162,7 @@ void ModeAutorotate::run()
             // Steady state glide functions to be run only once
             if (_flags.ss_glide_initial == true) {
 
-                #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+                #if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
                     gcs().send_text(MAV_SEVERITY_INFO, "SS Glide Phase");
                 #endif
 
@@ -204,7 +204,7 @@ void ModeAutorotate::run()
             // Entry phase functions to be run only once
             if (_flags.landed_initial == true) {
 
-                #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+                #if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
                     gcs().send_text(MAV_SEVERITY_INFO, "Landed");
                 #endif
                 _flags.landed_initial = false;

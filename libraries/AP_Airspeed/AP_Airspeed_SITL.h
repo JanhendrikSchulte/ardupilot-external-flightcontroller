@@ -5,7 +5,7 @@
 
 #include "AP_Airspeed_config.h"
 
-#if AP_AIRSPEED_SITL_ENABLED
+#if AP_AIRSPEED_SITL_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include "AP_Airspeed_Backend.h"
 

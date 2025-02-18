@@ -15,7 +15,11 @@
 
 #include "AP_WheelEncoder.h"
 #include "WheelEncoder_Quadrature.h"
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "WheelEncoder_EXTERNALFC_Quadrature.h"
+#else
 #include "WheelEncoder_SITL_Quadrature.h"
+#endif
 #include <AP_Logger/AP_Logger.h>
 
 extern const AP_HAL::HAL& hal;
@@ -173,7 +177,8 @@ void AP_WheelEncoder::init(void)
             break;
 
         case WheelEncoder_TYPE_SITL_QUADRATURE:
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TR?
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
             drivers[i] = NEW_NOTHROW AP_WheelEncoder_SITL_Quadrature(*this, i, state[i]);
 #endif
             break;

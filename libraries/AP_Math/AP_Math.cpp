@@ -342,7 +342,8 @@ uint16_t get_random16(void)
 // generate a random float between -1 and 1
 float rand_float(void)
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     return ((((unsigned)random()) % 2000000) - 1.0e6) / 1.0e6;
 #else
     return (get_random16() / 65535.0) * 2 - 1;
@@ -412,12 +413,12 @@ float calc_lowpass_alpha_dt(float dt, float cutoff_freq)
     float rc = 1.0f / (M_2PI * cutoff_freq);
     return dt / (dt + rc);
 }
-
+// TODO-TBU
 #ifndef AP_MATH_FILL_NANF_USE_MEMCPY
-#define AP_MATH_FILL_NANF_USE_MEMCPY (CONFIG_HAL_BOARD == HAL_BOARD_SITL)
+#define AP_MATH_FILL_NANF_USE_MEMCPY (CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC)
 #endif
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 // fill an array of float with NaN, used to invalidate memory in SITL
 void fill_nanf(float *f, uint16_t count)
 {

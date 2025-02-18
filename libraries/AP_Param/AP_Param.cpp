@@ -40,6 +40,9 @@
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     #include <SITL/SITL.h>
 #endif
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+    #include <EXTERNALFC/EXTERNALFC.h>
+#endif
 
 #include "AP_Param_config.h"
 
@@ -1601,8 +1604,8 @@ void AP_Param::reload_defaults_file(bool last_pass)
         load_embedded_param_defaults(last_pass);
     }
 #endif
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL && !defined(HAL_BUILD_AP_PERIPH)
+// TODO-TBU
+#if (CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC) && !defined(HAL_BUILD_AP_PERIPH)
     hal.util->set_cmdline_parameters();
 #endif
 }
@@ -1611,11 +1614,11 @@ void AP_Param::reload_defaults_file(bool last_pass)
 void AP_Param::load_defaults_file_from_filesystem(const char *default_file, bool last_pass)
 {
     if (load_defaults_file(default_file, last_pass)) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         printf("Loaded defaults from %s\n", default_file);
 #endif
     } else {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Failed to load defaults from %s", default_file);
 #else
         printf("Failed to load defaults from %s\n", default_file);
@@ -2256,8 +2259,8 @@ bool AP_Param::parse_param_line(char *line, char **vname, float &value, bool &re
     if (strlen(pname) > AP_MAX_NAME_SIZE) {
         return false;
     }
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     // Workaround to prevent FORMAT_VERSION in param file resulting in invalid
     // EEPROM. For details, see: https://github.com/ArduPilot/ardupilot/issues/15579
     if (strcmp(pname, "FORMAT_VERSION") == 0) {

@@ -21,7 +21,8 @@ uint8_t smbus_cell_ids[] = { 0x3f,  // cell 1
                              0x36,  // cell 10
                              0x35,  // cell 11
                              0x34,  // cell 12
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
                              0x33,  // cell 13
                              0x32   // cell 14
 #endif

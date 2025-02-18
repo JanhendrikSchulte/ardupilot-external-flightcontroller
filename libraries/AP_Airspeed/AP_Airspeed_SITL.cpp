@@ -1,6 +1,6 @@
 #include "AP_Airspeed_SITL.h"
 
-#if AP_AIRSPEED_SITL_ENABLED
+#if AP_AIRSPEED_SITL_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include <AP_Baro/AP_Baro.h>
 #include <SITL/SITL.h>

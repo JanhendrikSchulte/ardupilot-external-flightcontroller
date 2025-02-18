@@ -3,7 +3,7 @@
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 extern const AP_HAL::HAL& hal;
 

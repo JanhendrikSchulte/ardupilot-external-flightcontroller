@@ -347,7 +347,8 @@ Vector3F get_vel_correction_for_sensor_offset(const Vector3F &sensor_offset_bf, 
  */
 float calc_lowpass_alpha_dt(float dt, float cutoff_freq);
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBC see if necessary
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 // fill an array of float with NaN, used to invalidate memory in SITL
 void fill_nanf(float *f, uint16_t count);
 void fill_nanf(double *f, uint16_t count);

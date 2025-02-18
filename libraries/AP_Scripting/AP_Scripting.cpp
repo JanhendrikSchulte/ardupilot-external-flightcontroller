@@ -37,7 +37,7 @@
 #endif // !defined(SCRIPTING_STACK_MAX_SIZE)
 
 #if !defined(SCRIPTING_HEAP_SIZE)
-  #if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX || HAL_MEM_CLASS >= HAL_MEM_CLASS_1000
+  #if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_LINUX || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC || HAL_MEM_CLASS >= HAL_MEM_CLASS_1000
     #define SCRIPTING_HEAP_SIZE (200 * 1024)
   #elif HAL_MEM_CLASS >= HAL_MEM_CLASS_500
     #define SCRIPTING_HEAP_SIZE (100 * 1024)
@@ -205,7 +205,7 @@ const AP_Param::GroupInfo AP_Scripting::var_info[] = {
 AP_Scripting::AP_Scripting() {
     AP_Param::setup_object_defaults(this, var_info);
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("Scripting must be a singleton");
     }

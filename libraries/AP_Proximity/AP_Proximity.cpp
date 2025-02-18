@@ -24,8 +24,13 @@
 #include "AP_Proximity_MAV.h"
 #include "AP_Proximity_LightWareSF40C.h"
 #include "AP_Proximity_LightWareSF45B.h"
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AP_Proximity_EXTERNALFC.h"
+#include "AP_Proximity_AirSimEXTERNALFC.h"
+#else
 #include "AP_Proximity_SITL.h"
 #include "AP_Proximity_AirSimSITL.h"
+#endif
 #include "AP_Proximity_Cygbot_D1.h"
 #include "AP_Proximity_DroneCAN.h"
 #include "AP_Proximity_Scripting.h"
@@ -125,7 +130,7 @@ const AP_Param::GroupInfo *AP_Proximity::backend_var_info[PROXIMITY_MAX_INSTANCE
 AP_Proximity::AP_Proximity()
 {
     AP_Param::setup_object_defaults(this, var_info);
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("AP_Proximity must be singleton");
     }

@@ -5,7 +5,7 @@
  * It's not an elegant solution but we can improve it in future.
  */
 #pragma once
-
+// TODO-POI
 // @LoggerEnum: HAL_BOARD
 #define HAL_BOARD_SITL     3
 // #define HAL_BOARD_SMACCM   4  // unused
@@ -16,6 +16,7 @@
 // #define HAL_BOARD_F4LIGHT  11 // reserved
 #define HAL_BOARD_ESP32	   12
 #define HAL_BOARD_QURT     13
+#define HAL_BOARD_EXTERNALFC 14
 #define HAL_BOARD_EMPTY    99
 // @LoggerEnumEnd
 
@@ -134,6 +135,8 @@
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     #include <AP_HAL/board/sitl.h>
+#elif CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+	#include <AP_HAL/board/externalfc.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_LINUX
     #include <AP_HAL/board/linux.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_EMPTY
@@ -320,7 +323,8 @@
 // On an F7 The difference in CPU load between 1 notch and 24 notches is about 2%
 // The difference in CPU load between 1Khz backend and 2Khz backend is about 10%
 // So at 1Khz almost all notch combinations can be supported on F7 and certainly H7
-#if defined(STM32H7) || CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-TBU
+#if defined(STM32H7) || CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 // Enough for a double-notch per motor on an octa using three IMUs and one harmonics
 // plus one static notch with one double-notch harmonics
 #define HAL_HNF_MAX_FILTERS 54
@@ -335,8 +339,8 @@
 #define HAL_HNF_MAX_FILTERS 24
 #endif
 #endif // HAL_HNF_MAX_FILTERS
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL // allow SITL to have all the CANFD options
+// TODO-TBU
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC // allow SITL to have all the CANFD options
 #define HAL_CANFD_SUPPORTED 8
 #elif !defined(HAL_CANFD_SUPPORTED)
 #define HAL_CANFD_SUPPORTED 0

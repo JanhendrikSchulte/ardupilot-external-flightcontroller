@@ -152,7 +152,7 @@ const AP_Param::GroupInfo AC_Fence::var_info[] = {
 /// Default constructor.
 AC_Fence::AC_Fence()
 {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     if (_singleton != nullptr) {
         AP_HAL::panic("Fence must be singleton");
     }

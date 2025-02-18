@@ -31,7 +31,11 @@
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_HAL/I2CDevice.h>
 
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AP_Baro_EXTERNALFC.h"
+#else
 #include "AP_Baro_SITL.h"
+#endif
 #include "AP_Baro_BMP085.h"
 #include "AP_Baro_BMP280.h"
 #include "AP_Baro_BMP388.h"
@@ -534,11 +538,22 @@ void AP_Baro::init(void)
         sensors[i].bus_id.set(0);
     }
 
-#if AP_SIM_BARO_ENABLED
-    SITL::SIM *sitl = AP::sitl();
+#if AP_SIM_BARO_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+    EXTERNALFC::SIM *sitl = AP::sitl();
     if (sitl == nullptr) {
         AP_HAL::panic("No SITL pointer");
     }
+#if !AP_TEST_DRONECAN_DRIVERS
+    // use dronecan instances instead of SITL instances
+    for(uint8_t i = 0; i < sitl->baro_count; i++) {
+        ADD_BACKEND(NEW_NOTHROW AP_Baro_SITL(*this));
+    }
+#endif
+#elif AP_SIM_BARO_ENABLED
+	SITL::SIM *sitl = AP::sitl();
+	if (sitl == nullptr) {
+		AP_HAL::panic("No SITL pointer");
+	}
 #if !AP_TEST_DRONECAN_DRIVERS
     // use dronecan instances instead of SITL instances
     for(uint8_t i = 0; i < sitl->baro_count; i++) {
@@ -565,7 +580,8 @@ void AP_Baro::init(void)
 #define GET_I2C_DEVICE(bus, address) _have_i2c_driver(bus, address)?nullptr:hal.i2c_mgr->get_device(bus, address)
 
 #if AP_SIM_BARO_ENABLED
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL && AP_BARO_MS56XX_ENABLED
+// TODO-POI
+#if (CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC) && AP_BARO_MS56XX_ENABLED
     ADD_BACKEND(AP_Baro_MS56XX::probe(*this,
                                       std::move(GET_I2C_DEVICE(_ext_bus, HAL_BARO_MS5611_I2C_ADDR))));
 #endif

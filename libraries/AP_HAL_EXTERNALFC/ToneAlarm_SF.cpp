@@ -13,7 +13,7 @@
 
 #include "Synth.hpp"
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 sf::SoundBuffer soundBuffer;
 sf::Sound demoSound;

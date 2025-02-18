@@ -58,7 +58,7 @@ const AP_Param::GroupInfo AC_Sprayer::var_info[] = {
 AC_Sprayer::AC_Sprayer()
 {
     if (_singleton) {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
         AP_HAL::panic("Too many sprayers");
 #endif
         return;

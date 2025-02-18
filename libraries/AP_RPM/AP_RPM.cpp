@@ -19,7 +19,11 @@
 
 #include "RPM_Backend.h"
 #include "RPM_Pin.h"
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "RPM_EXTERNALFC.h"
+#else
 #include "RPM_SITL.h"
+#endif
 #include "RPM_EFI.h"
 #include "RPM_Generator.h"
 #include "RPM_HarmonicNotch.h"

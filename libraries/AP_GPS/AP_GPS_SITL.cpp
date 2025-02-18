@@ -15,7 +15,7 @@
 
 #include "AP_GPS_SITL.h"
 
-#if HAL_SIM_GPS_ENABLED
+#if HAL_SIM_GPS_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include <ctype.h>
 #include <stdint.h>

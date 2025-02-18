@@ -19,7 +19,7 @@
 
 #include "SITL.h"
 
-#if AP_SIM_ENABLED
+#if AP_SIM_ENABLED && CONFIG_HAL_BOARD == HAL_BOARD_SITL
 
 #include <AP_Common/AP_Common.h>
 #include <AP_HAL/AP_HAL.h>

@@ -13,7 +13,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-using EXTERNALFC::Scheduler;
+using HALEXTERNALFC::Scheduler;
 
 namespace AP_HAL {
 
@@ -183,7 +183,7 @@ uint16_t millis16()
     
 uint64_t micros64()
 {
-    const EXTERNALFC::Scheduler* scheduler = EXTERNALFC::Scheduler::from(hal.scheduler);
+    const HALEXTERNALFC::Scheduler* scheduler = HALEXTERNALFC::Scheduler::from(hal.scheduler);
     uint64_t stopped_usec = scheduler->stopped_clock_usec();
     if (stopped_usec) {
         return stopped_usec;

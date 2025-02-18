@@ -44,7 +44,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 #if HAL_CANMANAGER_ENABLED
 #define Debug(fmt, args...) do { AP::can().log_text(AP_CANManager::LOG_DEBUG, "CANSITLIface", fmt, ##args); } while (0)
@@ -214,17 +214,17 @@ bool CANIface::init(const uint32_t bitrate, const OperatingMode mode)
     if (_self_index >= HAL_NUM_CAN_IFACES) {
         return false;
     }
-    const SITL::SIM::CANTransport can_type = _sitl->can_transport[_self_index];
+    const EXTERNALFC::SIM::CANTransport can_type = _sitl->can_transport[_self_index];
     switch (can_type) {
-    case SITL::SIM::CANTransport::MulticastUDP:
+    case EXTERNALFC::SIM::CANTransport::MulticastUDP:
         transport = NEW_NOTHROW CAN_Multicast();
         break;
 #if HAL_CAN_WITH_SOCKETCAN
-    case SITL::SIM::CANTransport::SocketCAN:
+    case EXTERNALFC::SIM::CANTransport::SocketCAN:
         transport = NEW_NOTHROW CAN_SocketCAN();
         break;
 #endif
-    case SITL::SIM::CANTransport::None:
+    case EXTERNALFC::SIM::CANTransport::None:
     default: // if user supplies an invalid value for the parameter
         transport = nullptr;
         break;

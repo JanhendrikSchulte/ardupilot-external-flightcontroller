@@ -50,8 +50,8 @@ void setup();
 void loop();
 
 const AP_HAL::HAL& hal = AP_HAL::get_HAL();
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 void stm32_watchdog_init() {}
 void stm32_watchdog_pat() {}
 #endif

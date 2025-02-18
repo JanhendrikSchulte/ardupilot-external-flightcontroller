@@ -18,7 +18,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 // scaling value taken from AP_Airspeed_analog.cpp
 #define VOLTS_TO_PASCAL 819

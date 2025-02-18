@@ -53,8 +53,8 @@ extern const AP_HAL::HAL& hal;
 #endif
 
 #define LOG_TAG "GPS"
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 #define NATIVE_TIME_OFFSET (AP_HAL::micros64() - AP_HAL::micros64())
 #else
 #define NATIVE_TIME_OFFSET 0

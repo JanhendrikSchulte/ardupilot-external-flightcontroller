@@ -15,3 +15,7 @@
 #include "AP_IRLock_SITL_Gazebo.h"
 #include "AP_IRLock_SITL.h"
 #endif
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
+#include "AP_IRLock_EXTERNALFC_Gazebo.h"
+#include "AP_IRLock_EXTERNALFC.h"
+#endif

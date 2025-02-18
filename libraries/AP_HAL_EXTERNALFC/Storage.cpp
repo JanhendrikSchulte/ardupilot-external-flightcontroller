@@ -21,7 +21,7 @@
 #endif
 #endif
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 extern HAL_SITL& hal;
 

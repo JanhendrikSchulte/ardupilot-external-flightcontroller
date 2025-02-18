@@ -7,7 +7,7 @@
 
 #include "AP_HAL_EXTERNALFC.h"
 
-class EXTERNALFC::RCInput : public AP_HAL::RCInput {
+class HALEXTERNALFC::RCInput : public AP_HAL::RCInput {
 public:
     explicit RCInput(SITL_State *sitlState): _sitlState(sitlState) {}
     void init() override;

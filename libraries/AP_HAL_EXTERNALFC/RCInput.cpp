@@ -6,7 +6,7 @@
 #include "RCInput.h"
 #include <AP_RCProtocol/AP_RCProtocol.h>
 
-using namespace EXTERNALFC;
+using namespace HALEXTERNALFC;
 
 extern const AP_HAL::HAL& hal;
 

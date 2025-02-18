@@ -114,8 +114,8 @@
 #endif
 
 #include "Parameters.h"
-
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+// TODO-
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
 void stm32_watchdog_init();
 void stm32_watchdog_pat();
 #endif
@@ -202,7 +202,7 @@ public:
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
     static ChibiOS::CANIface* can_iface_periph[HAL_NUM_CAN_IFACES];
-#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#elif CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNALFC
     static HALSITL::CANIface* can_iface_periph[HAL_NUM_CAN_IFACES];
 #endif
 
