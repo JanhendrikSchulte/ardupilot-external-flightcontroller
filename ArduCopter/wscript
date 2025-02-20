@@ -1,12 +1,36 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
+# TODO-TBD STRIP LIBRARIES
 def build(bld):
+    stripped_libaries = 'CONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_LINUX_EXT' in bld.env.DEFINES
+    # stripped_libraries to just init barebone sensors for reduced complexity and buildtime (imu, gps, barometer, compass, cause the external fc only uses this sensors)
     vehicle = bld.path.name
     bld.ap_stlib(
         name=vehicle + '_libs',
         ap_vehicle=vehicle,
-        ap_libraries=bld.ap_common_vehicle_libraries() + [
+        ap_libraries=bld.ap_common_vehicle_libraries(stripped_libaries) + [
+            'AC_AttitudeControl',
+            'AC_InputManager',
+        #    'AC_PrecLand',
+        #    'AC_Sprayer',
+            'AC_Autorotation',
+            'AC_WPNav',
+        #    'AP_Camera',
+        #    'AP_IRLock',
+            'AP_InertialNav',
+            'AP_Motors',
+            'AP_Avoidance',
+            'AP_AdvancedFailsafe',
+            'AP_SmartRTL',
+        #    'AP_WheelEncoder',
+        #    'AP_Winch',
+            'AP_Follow',
+        #    'AP_LTM_Telem',
+        #    'AP_Devo_Telem',
+            'AC_AutoTune',
+            'AP_KDECAN',
+        #    'AP_SurfaceDistance'
+        ] if stripped_libaries else [
             'AC_AttitudeControl',
             'AC_InputManager',
             'AC_PrecLand',

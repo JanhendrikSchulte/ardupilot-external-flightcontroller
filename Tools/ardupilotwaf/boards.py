@@ -670,217 +670,6 @@ Please use a replacement build as follows:
         _board = _board_classes[ctx.env.BOARD]()
     return _board
 
-class external(Board):
-
-    def __init__(self):
-        self.with_can = True
-
-    def configure_env(self, cfg, env):
-        super(external, self).configure_env(cfg, env)
-        env.DEFINES.update(
-            CONFIG_HAL_BOARD = 'HAL_BOARD_SITL',
-            CONFIG_HAL_BOARD_SUBTYPE = 'HAL_BOARD_SUBTYPE_NONE',
-            AP_SCRIPTING_CHECKS = 1, # SITL should always do runtime scripting checks
-            AP_BARO_PROBE_EXTERNAL_I2C_BUSES = 1,
-        )
-
-        env.BOARD_CLASS = "SITL"
-
-        cfg.define('AP_SIM_ENABLED', 1)
-        cfg.define('HAL_WITH_SPI', 1)
-        cfg.define('HAL_WITH_RAMTRON', 1)
-        cfg.define('AP_OPENDRONEID_ENABLED', 1)
-        cfg.define('AP_SIGNED_FIRMWARE', 0)
-
-        cfg.define('AP_NOTIFY_LP5562_BUS', 2)
-        cfg.define('AP_NOTIFY_LP5562_ADDR', 0x30)
-
-        # turn on fencepoint and rallypoint protocols so they're still tested:
-        env.CXXFLAGS.extend([
-            '-DAP_MAVLINK_RALLY_POINT_PROTOCOL_ENABLED=HAL_GCS_ENABLED&&HAL_RALLY_ENABLED',
-            '-DAC_POLYFENCE_FENCE_POINT_PROTOCOL_SUPPORT=HAL_GCS_ENABLED&&AP_FENCE_ENABLED'
-        ])
-
-        try:
-            env.CXXFLAGS.remove('-DHAL_NAVEKF2_AVAILABLE=0')
-        except ValueError:
-            pass
-        env.CXXFLAGS += ['-DHAL_NAVEKF2_AVAILABLE=1']
-
-        if self.with_can:
-            cfg.define('HAL_NUM_CAN_IFACES', 2)
-            env.DEFINES.update(CANARD_MULTI_IFACE=1,
-                               CANARD_IFACE_ALL = 0x3,
-                               CANARD_ENABLE_CANFD = 1,
-                               CANARD_ENABLE_ASSERTS = 1)
-            if not cfg.options.force_32bit:
-                # needed for cygwin
-                env.CXXFLAGS += [ '-DCANARD_64_BIT=1' ]
-                env.CFLAGS += [ '-DCANARD_64_BIT=1' ]
-            if Utils.unversioned_sys_platform().startswith("linux"):
-                cfg.define('HAL_CAN_WITH_SOCKETCAN', 1)
-            else:
-                cfg.define('HAL_CAN_WITH_SOCKETCAN', 0)
-
-        env.CXXFLAGS += [
-            '-Werror=float-equal',
-            '-Werror=missing-declarations',
-        ]
-
-        if not cfg.options.disable_networking and not 'clang' in cfg.env.COMPILER_CC:
-            # lwip doesn't build with clang
-            env.CXXFLAGS += ['-DAP_NETWORKING_ENABLED=1']
-        
-        if cfg.options.ubsan or cfg.options.ubsan_abort:
-            env.CXXFLAGS += [
-                "-fsanitize=undefined",
-                "-fsanitize=float-cast-overflow",
-                "-DUBSAN_ENABLED",
-            ]
-            env.LINKFLAGS += [
-                "-fsanitize=undefined",
-                "-lubsan",
-            ]
-
-        if cfg.options.ubsan_abort:
-            env.CXXFLAGS += [
-                "-fno-sanitize-recover"
-            ]
-
-        if not cfg.env.DEBUG:
-            env.CXXFLAGS += [
-                '-O3',
-            ]
-
-        if 'clang++' in cfg.env.COMPILER_CXX and cfg.options.asan:
-            env.CXXFLAGS += [
-                '-fsanitize=address',
-                '-fno-omit-frame-pointer',
-            ]
-
-        env.LIB += [
-            'm',
-        ]
-
-        cfg.check_librt(env)
-        cfg.check_feenableexcept()
-
-        env.LINKFLAGS += ['-pthread',]
-
-        if cfg.env.DEBUG and 'clang++' in cfg.env.COMPILER_CXX and cfg.options.asan:
-             env.LINKFLAGS += ['-fsanitize=address']
-
-        env.AP_LIBRARIES += [
-            'AP_HAL_SITL',
-            'AP_CSVReader',
-        ]
-
-        env.AP_LIBRARIES += [
-            'SITL',
-        ]
-
-        # wrap malloc to ensure memory is zeroed
-        if cfg.env.DEST_OS == 'cygwin':
-            # on cygwin we need to wrap _malloc_r instead
-            env.LINKFLAGS += ['-Wl,--wrap,_malloc_r']
-        elif platform.system() != 'Darwin':
-            env.LINKFLAGS += ['-Wl,--wrap,malloc']
-        
-        if cfg.options.enable_sfml:
-            if not cfg.check_SFML(env):
-                cfg.fatal("Failed to find SFML libraries")
-
-        if cfg.options.enable_sfml_joystick:
-            if not cfg.check_SFML(env):
-                cfg.fatal("Failed to find SFML libraries")
-            env.CXXFLAGS += ['-DSFML_JOYSTICK']
-
-        if cfg.options.sitl_osd:
-            env.CXXFLAGS += ['-DWITH_SITL_OSD','-DOSD_ENABLED=1']
-            for f in os.listdir('libraries/AP_OSD/fonts'):
-                if fnmatch.fnmatch(f, "font*bin"):
-                    env.ROMFS_FILES += [(f,'libraries/AP_OSD/fonts/'+f)]
-
-        for f in os.listdir('Tools/autotest/models'):
-            if fnmatch.fnmatch(f, "*.json") or fnmatch.fnmatch(f, "*.parm"):
-                env.ROMFS_FILES += [('models/'+f,'Tools/autotest/models/'+f)]
-
-        # include locations.txt so SITL on windows can lookup by name
-        env.ROMFS_FILES += [('locations.txt','Tools/autotest/locations.txt')]
-
-        # embed any scripts from ROMFS/scripts
-        if os.path.exists('ROMFS/scripts'):
-            for f in os.listdir('ROMFS/scripts'):
-                if fnmatch.fnmatch(f, "*.lua"):
-                    env.ROMFS_FILES += [('scripts/'+f,'ROMFS/scripts/'+f)]
-
-        if cfg.options.sitl_rgbled:
-            env.CXXFLAGS += ['-DWITH_SITL_RGBLED']
-
-        if cfg.options.enable_sfml_audio:
-            if not cfg.check_SFML_Audio(env):
-                cfg.fatal("Failed to find SFML Audio libraries")
-            env.CXXFLAGS += ['-DWITH_SITL_TONEALARM']
-
-        if cfg.env.DEST_OS == 'cygwin':
-            env.LIB += [
-                'winmm',
-            ]
-
-        if Utils.unversioned_sys_platform() == 'cygwin':
-            env.CXXFLAGS += ['-DCYGWIN_BUILD']
-
-        if 'clang++' in cfg.env.COMPILER_CXX:
-            print("Disabling SLP for clang++")
-            env.CXXFLAGS += [
-                '-fno-slp-vectorize' # compiler bug when trying to use SLP
-            ]
-
-        if cfg.options.force_32bit:
-            # 32bit platform flags
-            env.CXXFLAGS += [
-                '-m32',
-            ]
-            env.CFLAGS += [
-                '-m32',
-            ]
-            env.LDFLAGS += [
-                '-m32',
-            ]
-
-        # whitelist of compilers which we should build with -Werror
-        gcc_whitelist = frozenset([
-                ('11','3','0'),
-                ('11','4','0'),
-                ('12','1','0'),
-            ])
-
-        # initialise werr_enabled from defaults:
-        werr_enabled = bool('g++' in cfg.env.COMPILER_CXX and cfg.env.CC_VERSION in gcc_whitelist)
-
-        # now process overrides to that default:
-        if (cfg.options.Werror is not None and
-                cfg.options.Werror == cfg.options.disable_Werror):
-            cfg.fatal("Asked to both enable and disable Werror")
-
-        if cfg.options.Werror is not None:
-            werr_enabled = cfg.options.Werror
-        elif cfg.options.disable_Werror is not None:
-            werr_enabled = not cfg.options.disable_Werror
-
-        if werr_enabled:
-            cfg.msg("Enabling -Werror", "yes")
-            if '-Werror' not in env.CXXFLAGS:
-                env.CXXFLAGS += [ '-Werror' ]
-        else:
-            cfg.msg("Enabling -Werror", "no")
-            if '-Werror' in env.CXXFLAGS:
-                env.CXXFLAGS.remove('-Werror')
-
-    def get_name(self):
-        return self.__class__.__name__
-
-
 # NOTE: Keeping all the board definitions together so we can easily
 # identify opportunities to simplify common flags. In the future might
 # be worthy to keep board definitions in files of their own.
@@ -1652,6 +1441,109 @@ class linux(Board):
         # get name of class
         return self.__class__.__name__
 
+# TODO-TBD change board type to non linux?
+class ext(Board):
+    def __init__(self):
+        if self.toolchain == 'native':
+            self.with_can = True
+        else:
+            self.with_can = False
+
+    def configure_env(self, cfg, env):
+        if cfg.options.board == 'linux':
+            self.with_can = True
+        super(ext, self).configure_env(cfg, env)
+
+        env.BOARD_CLASS = "LINUX"
+
+        env.DEFINES.update(
+            CONFIG_HAL_BOARD = 'HAL_BOARD_LINUX',
+            CONFIG_HAL_BOARD_SUBTYPE='HAL_BOARD_SUBTYPE_LINUX_EXT',
+            AP_WINCH_ENABLED= 0,
+            AP_AIRSPEED_ENABLED = 0, #?
+            #AP_RC_CHANNEL_ENABLED = 0, TODO-
+            AP_RANGEFINDER_ENABLED = 0,
+            AP_WINDVANE_ENABLED = 0,
+            AP_VIDEOTX_ENABLED = 0,
+            AP_SERVO_TELEM_ENABLED = 0, #?
+            AP_SCRIPTING_ENABLED = 0, #?
+            AP_SBUSOUTPUT_ENABLED = 0,
+            AP_SIM_ENABLED = 0,
+        )
+
+        if not cfg.env.DEBUG:
+            env.CXXFLAGS += [
+                '-O3',
+            ]
+
+        env.LIB += [
+            'm',
+        ]
+
+        cfg.check_librt(env)
+        cfg.check_lttng(env)
+        cfg.check_libdl(env)
+        cfg.check_libiio(env)
+
+        env.LINKFLAGS += ['-pthread',]
+        env.AP_LIBRARIES += [
+            'AP_HAL_EXTERNAL_FC'
+        ]
+
+        # wrap malloc to ensure memory is zeroed
+        env.LINKFLAGS += ['-Wl,--wrap,malloc']
+
+        if cfg.options.force_32bit:
+            env.DEFINES.update(
+                HAL_FORCE_32BIT = 1,
+            )
+            # 32bit platform flags
+            cfg.env.CXXFLAGS += [
+                '-m32',
+            ]
+            cfg.env.CFLAGS += [
+                '-m32',
+            ]
+            cfg.env.LDFLAGS += [
+                '-m32',
+            ]
+        else:
+            env.DEFINES.update(
+                HAL_FORCE_32BIT = 0,
+            )
+        if self.with_can and cfg.options.board == 'linux':
+            cfg.env.HAL_NUM_CAN_IFACES = 2
+            cfg.define('HAL_NUM_CAN_IFACES', 2)
+            cfg.define('HAL_CANFD_SUPPORTED', 1)
+            cfg.define('CANARD_ENABLE_CANFD', 1)
+        
+        if self.with_can:
+            env.DEFINES.update(CANARD_MULTI_IFACE=1,
+                               CANARD_IFACE_ALL = 0x3)
+
+        if cfg.options.apstatedir:
+            cfg.define('AP_STATEDIR', cfg.options.apstatedir)
+
+        defaults_file = 'libraries/AP_HAL_Linux/boards/%s/defaults.parm' % self.get_name()
+        if os.path.exists(defaults_file):
+            env.ROMFS_FILES += [('defaults.parm', defaults_file)]
+            env.DEFINES.update(
+                HAL_PARAM_DEFAULTS_PATH='"@ROMFS/defaults.parm"',
+            )
+
+    def build(self, bld):
+        super(linux, self).build(bld)
+        if bld.options.upload:
+            waflib.Options.commands.append('rsync')
+            # Avoid infinite recursion
+            bld.options.upload = False
+
+    def get_name(self):
+        # get name of class
+        return self.__class__.__name__
+
+    def build(self, bld):
+        super(ext, self).build(bld)
 
 class navigator(linux):
     toolchain = 'arm-linux-gnueabihf'
