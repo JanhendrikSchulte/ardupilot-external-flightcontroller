@@ -32,7 +32,7 @@ const AP_HAL::HAL& hal = AP_HAL::get_HAL();
 void setup();
 void loop();
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_LINUX || CONFIG_HAL_BOARD == HAL_BOARD_SITL
+#if CONFIG_HAL_BOARD == HAL_BOARD_LINUX || CONFIG_HAL_BOARD == HAL_BOARD_SITL || CONFIG_HAL_BOARD == HAL_BOARD_EXTERNAL_FC
 
 #include <AP_HAL/utility/Socket_native.h>
 #include <AP_RCProtocol/AP_RCProtocol.h>

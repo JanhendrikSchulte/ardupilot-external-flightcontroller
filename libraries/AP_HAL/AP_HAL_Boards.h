@@ -7,16 +7,17 @@
 #pragma once
 
 // @LoggerEnum: HAL_BOARD
-#define HAL_BOARD_SITL     3
-// #define HAL_BOARD_SMACCM   4  // unused
-// #define HAL_BOARD_PX4      5  // unused
-#define HAL_BOARD_LINUX    7
-// #define HAL_BOARD_VRBRAIN  8
-#define HAL_BOARD_CHIBIOS  10
+#define HAL_BOARD_SITL         3
+// #define HAL_BOARD_SMACCM    4  // unused
+// #define HAL_BOARD_PX4       5  // unused
+#define HAL_BOARD_LINUX        7
+// #define HAL_BOARD_VRBRAIN   8
+#define HAL_BOARD_CHIBIOS     10
 // #define HAL_BOARD_F4LIGHT  11 // reserved
-#define HAL_BOARD_ESP32	   12
-#define HAL_BOARD_QURT     13
-#define HAL_BOARD_EMPTY    99
+#define HAL_BOARD_ESP32	      12
+#define HAL_BOARD_QURT        13
+#define HAL_BOARD_EXTERNAL_FC 20
+#define HAL_BOARD_EMPTY       99
 // @LoggerEnumEnd
 
 // @LoggerEnum: HAL_BOARD_SUBTYPE
@@ -137,6 +138,8 @@
     #include <AP_HAL/board/sitl.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_LINUX
     #include <AP_HAL/board/linux.h>
+#elif CONFIG_HAL_BOARD == HAL_BOARD_EXTERNAL_FC
+    #include <AP_HAL/board/external_fc.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_EMPTY
     #include <AP_HAL/board/empty.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS

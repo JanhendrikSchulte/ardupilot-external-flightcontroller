@@ -1457,8 +1457,8 @@ class ext(Board):
         env.BOARD_CLASS = "LINUX"
 
         env.DEFINES.update(
-            CONFIG_HAL_BOARD = 'HAL_BOARD_LINUX',
-            CONFIG_HAL_BOARD_SUBTYPE='HAL_BOARD_SUBTYPE_LINUX_EXT',
+            CONFIG_HAL_BOARD = 'HAL_BOARD_EXTERNAL_FC',
+            CONFIG_HAL_BOARD_SUBTYPE='HAL_BOARD_SUBTYPE_NONE',
             AP_WINCH_ENABLED= 0,
             AP_AIRSPEED_ENABLED = 0, #?
             #AP_RC_CHANNEL_ENABLED = 0, TODO-

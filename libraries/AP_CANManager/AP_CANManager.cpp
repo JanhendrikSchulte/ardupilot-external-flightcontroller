@@ -32,6 +32,8 @@
 #include <GCS_MAVLink/GCS.h>
 #if CONFIG_HAL_BOARD == HAL_BOARD_LINUX
 #include <AP_HAL_Linux/CANSocketIface.h>
+#elif CONFIG_HAL_BOARD == HAL_BOARD_EXTERNAL_FC
+#include <AP_HAL_EXTERNAL_FC/CANSocketIface.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <AP_HAL_SITL/CANSocketIface.h>
 #elif CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
