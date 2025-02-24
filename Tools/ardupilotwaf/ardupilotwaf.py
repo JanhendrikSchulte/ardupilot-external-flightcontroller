@@ -362,7 +362,7 @@ def ap_get_all_libraries(bld):
 
 @conf
 def ap_common_vehicle_libraries(bld, stripped_libraries = False):
-    libraries = (COMMON_VEHICLE_DEPENDENT_LIBRARIES_STRIPPED if stripped_libraries else COMMON_VEHICLE_DEPENDENT_LIBRARIES)
+    libraries = COMMON_VEHICLE_DEPENDENT_LIBRARIES_STRIPPED if stripped_libraries else COMMON_VEHICLE_DEPENDENT_LIBRARIES
 
     if bld.env.with_can or bld.env.HAL_NUM_CAN_IFACES:
         libraries.extend(COMMON_VEHICLE_DEPENDENT_CAN_LIBRARIES)
