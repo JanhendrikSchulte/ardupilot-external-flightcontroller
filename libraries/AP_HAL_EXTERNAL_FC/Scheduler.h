@@ -1,122 +1,126 @@
 #pragma once
 
+#include <AP_HAL/AP_HAL.h>
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNAL_FC
+#include "AP_HAL_EXTERNAL_FC.h"
+#include <sys/time.h>
 #include <pthread.h>
 
-#include "AP_HAL_Linux.h"
+#define SITL_SCHEDULER_MAX_TIMER_PROCS 8
+namespace EXTERNAL_FC
+{
 
-#include "Semaphores.h"
-#include "Thread.h"
+	/* Scheduler implementation: */
+	class Scheduler : public AP_HAL::Scheduler
+	{
+	public:
+		explicit Scheduler();
+		static Scheduler *from(AP_HAL::Scheduler *scheduler)
+		{
+			return static_cast<Scheduler *>(scheduler);
+		}
 
-#define LINUX_SCHEDULER_MAX_TIMER_PROCS 10
-#define LINUX_SCHEDULER_MAX_TIMESLICED_PROCS 10
-#define LINUX_SCHEDULER_MAX_IO_PROCS 10
+		/* AP_HAL::Scheduler methods */
 
-#define AP_LINUX_SENSORS_STACK_SIZE  256 * 1024
-#define AP_LINUX_SENSORS_SCHED_POLICY  SCHED_FIFO
-#define AP_LINUX_SENSORS_SCHED_PRIO 12
+		void init() override;
+		void delay(uint16_t ms) override;
+		void delay_microseconds(uint16_t us) override;
 
-namespace Linux {
+		void register_timer_process(AP_HAL::MemberProc) override;
+		void register_io_process(AP_HAL::MemberProc) override;
 
-class Scheduler : public AP_HAL::Scheduler {
-public:
-    Scheduler();
+		void register_timer_failsafe(AP_HAL::Proc, uint32_t period_us) override;
 
-    static Scheduler *from(AP_HAL::Scheduler *scheduler) {
-        return static_cast<Scheduler*>(scheduler);
-    }
+		bool in_main_thread() const override;
+		bool is_system_initialized() override { return _initialized; };
+		void set_system_initialized() override;
 
-    void     init() override;
-    void     delay(uint16_t ms) override;
-    void     delay_microseconds(uint16_t us) override;
+		void reboot(bool hold_in_bootloader) override;
 
-    void     register_timer_process(AP_HAL::MemberProc) override;
-    void     register_io_process(AP_HAL::MemberProc) override;
+		bool interrupts_are_blocked(void) const
+		{
+			return _nested_atomic_ctr != 0;
+		}
 
-    bool     in_main_thread() const override;
+		void sitl_begin_atomic()
+		{
+			_nested_atomic_ctr++;
+		}
+		void sitl_end_atomic();
 
-    void     register_timer_failsafe(AP_HAL::Proc, uint32_t period_us) override;
+		static void timer_event()
+		{
+			_run_timer_procs();
+			_run_io_procs();
+		}
 
-    void     set_system_initialized() override;
-    bool     is_system_initialized() override { return _initialized; };
+		uint64_t stopped_clock_usec() const { return _stopped_clock_usec; }
 
-    void     reboot(bool hold_in_bootloader) override;
+		static void _run_io_procs();
+		static bool _should_exit;
 
-    void     stop_clock(uint64_t time_usec) override;
+		/*
+		  create a new thread
+		 */
+		bool thread_create(AP_HAL::MemberProc, const char *name,
+						   uint32_t stack_size, priority_base base, int8_t priority) override;
 
-    uint64_t stopped_clock_usec() const { return _stopped_clock_usec; }
+		void set_in_semaphore_take_wait(bool value) { _in_semaphore_take_wait = value; }
+		/*
+		 * semaphore_wait_hack_required - possibly move time input step
+		 * forward even if we are currently pretending to be the IO or timer
+		 * threads.
+		 */
+		// a couple of helper functions to cope with SITL's time stepping
+		bool semaphore_wait_hack_required() const;
 
-    void microsleep(uint32_t usec);
+		// get the name of the current thread, or nullptr if not known
+		const char *get_current_thread_name(void) const;
 
-    void teardown();
+	private:
+		//SITL_State *_sitlState;
+		uint8_t _nested_atomic_ctr;
+		static AP_HAL::Proc _failsafe;
 
-    /*
-      create a new thread
-     */
-    bool thread_create(AP_HAL::MemberProc, const char *name, uint32_t stack_size, priority_base base, int8_t priority) override;
-    
-    /*
-      set cpu affinity mask to be applied on initialization - setting it
-      later has no effect.
-     */
-    void set_cpu_affinity(const cpu_set_t &cpu_affinity) { _cpu_affinity = cpu_affinity; }
+		static void _run_timer_procs();
 
-private:
-    class SchedulerThread : public PeriodicThread {
-    public:
-        SchedulerThread(Thread::task_t t, Scheduler &sched)
-            : PeriodicThread(t)
-            , _sched(sched)
-        { }
+		static volatile bool _timer_event_missed;
+		static AP_HAL::MemberProc _timer_proc[SITL_SCHEDULER_MAX_TIMER_PROCS];
+		static AP_HAL::MemberProc _io_proc[SITL_SCHEDULER_MAX_TIMER_PROCS];
+		static uint8_t _num_timer_procs;
+		static uint8_t _num_io_procs;
+		static bool _in_timer_proc;
+		static bool _in_io_proc;
 
-    protected:
-        bool _run() override;
+		// boolean set by the Semaphore code to indicate it's currently
+		// waiting for a take-timeout to occur.
+		static bool _in_semaphore_take_wait;
 
-        Scheduler &_sched;
-    };
+		void stop_clock(uint64_t time_usec) override;
 
-    void     init_realtime();
+		static void *thread_create_trampoline(void *ctx);
+		static void check_thread_stacks(void);
 
-    void     init_cpu_affinity();
+		bool _initialized;
+		uint64_t _stopped_clock_usec;
+		//uint64_t _last_io_run;
+		pthread_t _main_ctx;
 
-    void _wait_all_threads();
-
-    void     _debug_stack();
-
-    AP_HAL::Proc _failsafe;
-
-    bool _initialized;
-    pthread_barrier_t _initialized_barrier;
-
-    AP_HAL::MemberProc _timer_proc[LINUX_SCHEDULER_MAX_TIMER_PROCS];
-    uint8_t _num_timer_procs;
-    volatile bool _in_timer_proc;
-
-    AP_HAL::MemberProc _io_proc[LINUX_SCHEDULER_MAX_IO_PROCS];
-    uint8_t _num_io_procs;
-
-    // calculates an integer to be used as the priority for a
-    // newly-created thread
-    uint8_t calculate_thread_priority(priority_base base, int8_t priority) const;
-
-    SchedulerThread _timer_thread{FUNCTOR_BIND_MEMBER(&Scheduler::_timer_task, void), *this};
-    SchedulerThread _io_thread{FUNCTOR_BIND_MEMBER(&Scheduler::_io_task, void), *this};
-    SchedulerThread _rcin_thread{FUNCTOR_BIND_MEMBER(&Scheduler::_rcin_task, void), *this};
-    SchedulerThread _uart_thread{FUNCTOR_BIND_MEMBER(&Scheduler::_uart_task, void), *this};
-
-    void _timer_task();
-    void _io_task();
-    void _rcin_task();
-    void _uart_task();
-
-    void _run_io();
-    void _run_uarts();
-
-    uint64_t _stopped_clock_usec;
-    uint64_t _last_stack_debug_msec;
-    pthread_t _main_ctx;
-
-    Semaphore _io_semaphore;
-    cpu_set_t _cpu_affinity;
-};
+		static HAL_Semaphore _thread_sem;
+		struct thread_attr
+		{
+			struct thread_attr *next;
+			AP_HAL::MemberProc *f;
+			pthread_attr_t attr;
+			uint32_t stack_size;
+			void *stack;
+			const uint8_t *stack_min;
+			const char *name;
+			pthread_t thread;
+		};
+		static struct thread_attr *threads;
+		static const uint8_t stackfill = 0xEB;
+	};
 
 }
+#endif // CONFIG_HAL_BOARD

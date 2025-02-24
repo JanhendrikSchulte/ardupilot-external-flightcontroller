@@ -6,7 +6,7 @@
 #include <AP_HAL/Semaphores.h>
 #include <pthread.h>
 
-namespace Linux {
+namespace EXTERNAL_FC {
 
 class Semaphore : public AP_HAL::Semaphore {
 public:

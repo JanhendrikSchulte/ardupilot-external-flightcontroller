@@ -59,7 +59,7 @@
 // allow for static semaphores
 // TODO-TBD Namespace
 #include <AP_HAL_EXTERNAL_FC/Semaphores.h>
-#define HAL_Semaphore Linux::Semaphore
+#define HAL_Semaphore EXTERNAL_FC::Semaphore
 #define HAL_BinarySemaphore Linux::BinarySemaphore
 #endif
 

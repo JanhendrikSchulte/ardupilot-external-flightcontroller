@@ -1,200 +1,158 @@
-#include "Scheduler.h"
-
-#include <algorithm>
-#include <errno.h>
-#include <poll.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/mman.h>
-#include <sys/time.h>
-#include <unistd.h>
-
 #include <AP_HAL/AP_HAL.h>
-#include <AP_Math/AP_Math.h>
-#include <AP_Vehicle/AP_Vehicle_Type.h>
 
-#include "RCInput.h"
-#include "SPIUARTDriver.h"
-#include "Storage.h"
-#include "UARTDriver.h"
-#include "Util.h"
+#include "AP_HAL_EXTERNAL_FC.h"
+#include "Scheduler.h"
+#include <sys/time.h>
+#include <fenv.h>
+#include <AP_BoardConfig/AP_BoardConfig.h>
+#if defined (__clang__) || (defined (__APPLE__) && defined (__MACH__)) || defined (__OpenBSD__)
+#include <stdlib.h>
+#else
+#include <malloc.h>
+#endif
+#include <AP_RCProtocol/AP_RCProtocol.h>
+#ifdef UBSAN_ENABLED
+#include <fcntl.h>
+#include <sanitizer/asan_interface.h>
+#endif
 
-using namespace Linux;
+using namespace EXTERNAL_FC;
 
 extern const AP_HAL::HAL& hal;
 
-#define APM_LINUX_MAX_PRIORITY          20
-#define APM_LINUX_TIMER_PRIORITY        15
-#define APM_LINUX_UART_PRIORITY         14
-#define APM_LINUX_NET_PRIORITY          14
-#define APM_LINUX_RCIN_PRIORITY         13
-#define APM_LINUX_MAIN_PRIORITY         12
-#define APM_LINUX_IO_PRIORITY           10
-#define APM_LINUX_SCRIPTING_PRIORITY     1
-
-#define APM_LINUX_TIMER_RATE            1000
-#define APM_LINUX_UART_RATE             100
-#if CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_NAVIO ||    \
-    CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_ERLEBRAIN2 || \
-    CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_BH || \
-    CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_DARK || \
-    CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_PXFMINI || \
-    CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_CANZERO
-#define APM_LINUX_RCIN_RATE             500
-#define APM_LINUX_IO_RATE               50
-#elif CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_OBAL_V1
-#define APM_LINUX_RCIN_RATE             50
-#define APM_LINUX_IO_RATE               50
-#else
-#define APM_LINUX_RCIN_RATE             100
-#define APM_LINUX_IO_RATE               50
+#ifndef SITL_STACK_CHECKING_ENABLED
+//#define SITL_STACK_CHECKING_ENABLED !defined(__CYGWIN__) && !defined(__CYGWIN64__)
+// stack checking is disabled until the memory corruption issues are
+// fixed with pthread_attr_setstack.  These may be due to
+// changes in the way guard pages are handled.
+#define SITL_STACK_CHECKING_ENABLED 0
 #endif
 
-#define SCHED_THREAD(name_, UPPER_NAME_)                        \
-    {                                                           \
-        .name = "ap-" #name_,                                   \
-        .thread = &_##name_##_thread,                           \
-        .policy = SCHED_FIFO,                                   \
-        .prio = APM_LINUX_##UPPER_NAME_##_PRIORITY,             \
-        .rate = APM_LINUX_##UPPER_NAME_##_RATE,                 \
-    }
+AP_HAL::Proc Scheduler::_failsafe = nullptr;
 
-Scheduler::Scheduler()
+AP_HAL::MemberProc Scheduler::_timer_proc[SITL_SCHEDULER_MAX_TIMER_PROCS] = {nullptr};
+uint8_t Scheduler::_num_timer_procs = 0;
+bool Scheduler::_in_timer_proc = false;
+
+AP_HAL::MemberProc Scheduler::_io_proc[SITL_SCHEDULER_MAX_TIMER_PROCS] = {nullptr};
+uint8_t Scheduler::_num_io_procs = 0;
+bool Scheduler::_in_io_proc = false;
+bool Scheduler::_should_exit = false;
+
+bool Scheduler::_in_semaphore_take_wait = false;
+
+Scheduler::thread_attr *Scheduler::threads;
+HAL_Semaphore Scheduler::_thread_sem;
+
+Scheduler::Scheduler() :
+    _stopped_clock_usec(0)
 {
-    CPU_ZERO(&_cpu_affinity);
 }
 
+#ifdef UBSAN_ENABLED
+/*
+  catch ubsan errors and append to a log file
+ */
+extern "C" {
+void __ubsan_get_current_report_data(const char **OutIssueKind,
+                                     const char **OutMessage,
+                                     const char **OutFilename, unsigned *OutLine,
+                                     unsigned *OutCol, char **OutMemoryAddr);
 
-void Scheduler::init_realtime()
+void __ubsan_on_report();
+void __ubsan_on_report()
 {
-#if APM_BUILD_TYPE(APM_BUILD_Replay)
-    // we don't run Replay in real-time...
-    return;
+    static int fd = -1;
+    if (fd == -1) {
+        const char *ubsan_log_path = getenv("UBSAN_LOG_PATH");
+        if (ubsan_log_path == nullptr) {
+            ubsan_log_path = "ubsan.log";
+        }
+        if (ubsan_log_path != nullptr) {
+            fd = open(ubsan_log_path, O_APPEND|O_CREAT|O_WRONLY, 0644);
+        }
+    }
+    if (fd != -1) {
+        const char *OutIssueKind = nullptr;
+        const char *OutMessage = nullptr;
+        const char *OutFilename = nullptr;
+        unsigned OutLine=0;
+        unsigned OutCol=0;
+        char *OutMemoryAddr=nullptr;
+        __ubsan_get_current_report_data(&OutIssueKind, &OutMessage, &OutFilename,
+                                        &OutLine, &OutCol, &OutMemoryAddr);
+        dprintf(fd, "ubsan error: %s:%u:%u %s:%s\n",
+                OutFilename, OutLine, OutCol,
+                OutIssueKind, OutMessage);
+    }
+}
+}
 #endif
-#if APM_BUILD_TYPE(APM_BUILD_UNKNOWN)
-    // we opportunistically run examples/tools in realtime
-    if (geteuid() != 0) {
-        fprintf(stderr, "WARNING: not running as root. Will not use realtime scheduling\n");
-        return;
-    }
-#endif
-
-    mlockall(MCL_CURRENT|MCL_FUTURE);
-
-    struct sched_param param = { .sched_priority = APM_LINUX_MAIN_PRIORITY };
-    if (pthread_setschedparam(pthread_self(), SCHED_FIFO, &param) == -1) {
-        AP_HAL::panic("Scheduler: failed to set scheduling parameters: %s",
-                      strerror(errno));
-    }
-}
-
-void Scheduler::init_cpu_affinity()
-{
-    if (!CPU_COUNT(&_cpu_affinity)) {
-        return;
-    }
-
-    if (sched_setaffinity(0, sizeof(_cpu_affinity), &_cpu_affinity) != 0) {
-        AP_HAL::panic("Failed to set affinity for main process: %m");
-    }
-}
 
 void Scheduler::init()
 {
-    int ret;
-    const struct sched_table {
-        const char *name;
-        SchedulerThread *thread;
-        int policy;
-        int prio;
-        uint32_t rate;
-    } sched_table[] = {
-        SCHED_THREAD(timer, TIMER),
-        SCHED_THREAD(uart, UART),
-        SCHED_THREAD(rcin, RCIN),
-        SCHED_THREAD(io, IO),
-    };
-
     _main_ctx = pthread_self();
-
-    init_realtime();
-    init_cpu_affinity();
-
-    /* set barrier to N + 1 threads: worker threads + main */
-    unsigned n_threads = ARRAY_SIZE(sched_table) + 1;
-    ret = pthread_barrier_init(&_initialized_barrier, nullptr, n_threads);
-    if (ret) {
-        AP_HAL::panic("Scheduler: Failed to initialise barrier object: %s",
-                      strerror(ret));
-    }
-
-    for (size_t i = 0; i < ARRAY_SIZE(sched_table); i++) {
-        const struct sched_table *t = &sched_table[i];
-
-        t->thread->set_rate(t->rate);
-        t->thread->set_stack_size(1024 * 1024);
-        t->thread->start(t->name, t->policy, t->prio);
-    }
-
-#if defined(DEBUG_STACK) && DEBUG_STACK
-    register_timer_process(FUNCTOR_BIND_MEMBER(&Scheduler::_debug_stack, void));
-#endif
 }
 
-void Scheduler::_debug_stack()
+bool Scheduler::in_main_thread() const
 {
-    uint64_t now = AP_HAL::millis64();
-
-    if (now - _last_stack_debug_msec > 5000) {
-        fprintf(stderr, "Stack Usage:\n"
-                "\ttimer = %zu\n"
-                "\tio    = %zu\n"
-                "\trcin  = %zu\n"
-                "\tuart  = %zu\n",
-                _timer_thread.get_stack_usage(),
-                _io_thread.get_stack_usage(),
-                _rcin_thread.get_stack_usage(),
-                _uart_thread.get_stack_usage());
-        _last_stack_debug_msec = now;
+    if (!_in_timer_proc && !_in_io_proc && pthread_self() == _main_ctx) {
+        return true;
     }
+    return false;
 }
 
-void Scheduler::microsleep(uint32_t usec)
+/*
+ * semaphore_wait_hack_required - possibly move time input step
+ * forward even if we are currently pretending to be the IO or timer
+ * threads.
+ *
+ * Without this, if another thread has taken a semaphore (e.g. the
+ * Object Avoidance thread), and an "IO process" tries to take that
+ * semaphore with a timeout specified, then we end up not advancing
+ * time (due to the logic in SITL_State::wait_clock) and thus taking
+ * the semaphore never times out - meaning we essentially deadlock.
+ */
+bool Scheduler::semaphore_wait_hack_required() const
 {
-    struct timespec ts;
-    ts.tv_sec = 0;
-    ts.tv_nsec = usec*1000UL;
-    while (nanosleep(&ts, &ts) == -1 && errno == EINTR) ;
+    if (pthread_self() != _main_ctx) {
+        // only the main thread ever moves stuff forwards
+        return false;
+    }
+
+    return _in_semaphore_take_wait;
+}
+
+void Scheduler::delay_microseconds(uint16_t usec)
+{
+    /* if (_sitlState->_sitl == nullptr) {
+        // this allows examples to run
+        hal.scheduler->stop_clock(AP_HAL::micros64()+usec);
+        return;
+    }
+    uint64_t start = AP_HAL::micros64();
+    do {
+        uint64_t dtime = AP_HAL::micros64() - start;
+        if (dtime >= usec) {
+            break;
+        }
+        _sitlState->wait_clock(start + usec);
+    } while (true); */
 }
 
 void Scheduler::delay(uint16_t ms)
 {
-    if (_stopped_clock_usec) {
-        return;
-    }
-
-    if (ms == 0) {
-        return;
-    }
-
-    uint64_t now = AP_HAL::micros64();
-    uint64_t end = now + 1000UL * ms + 1U;
+    uint32_t start = AP_HAL::millis();
+    uint32_t now = start;
     do {
-        // this yields the CPU to other apps
-        microsleep(MIN(1000UL, end-now));
-        if (in_main_thread() && _min_delay_cb_ms <= ms) {
-            call_delay_cb();
+        delay_microseconds(1000);
+        if (_min_delay_cb_ms <= (ms - (now - start))) {
+            if (in_main_thread()) {
+                call_delay_cb();
+            }
         }
-        now = AP_HAL::micros64();
-    } while (now < end);
-}
-
-void Scheduler::delay_microseconds(uint16_t us)
-{
-    if (_stopped_clock_usec) {
-        return;
-    }
-    microsleep(us);
+        now = AP_HAL::millis();
+    } while (now - start < ms);
 }
 
 void Scheduler::register_timer_process(AP_HAL::MemberProc proc)
@@ -205,13 +163,10 @@ void Scheduler::register_timer_process(AP_HAL::MemberProc proc)
         }
     }
 
-    if (_num_timer_procs >= LINUX_SCHEDULER_MAX_TIMER_PROCS) {
-        hal.console->printf("Out of timer processes\n");
-        return;
+    if (_num_timer_procs < SITL_SCHEDULER_MAX_TIMER_PROCS) {
+        _timer_proc[_num_timer_procs] = proc;
+        _num_timer_procs++;
     }
-
-    _timer_proc[_num_timer_procs] = proc;
-    _num_timer_procs++;
 }
 
 void Scheduler::register_io_process(AP_HAL::MemberProc proc)
@@ -222,11 +177,9 @@ void Scheduler::register_io_process(AP_HAL::MemberProc proc)
         }
     }
 
-    if (_num_io_procs < LINUX_SCHEDULER_MAX_IO_PROCS) {
+    if (_num_io_procs < SITL_SCHEDULER_MAX_TIMER_PROCS) {
         _io_proc[_num_io_procs] = proc;
         _num_io_procs++;
-    } else {
-        hal.console->printf("Out of IO processes\n");
     }
 }
 
@@ -235,17 +188,64 @@ void Scheduler::register_timer_failsafe(AP_HAL::Proc failsafe, uint32_t period_u
     _failsafe = failsafe;
 }
 
-void Scheduler::_timer_task()
-{
-    int i;
+void Scheduler::set_system_initialized() {
+    if (_initialized) {
+        AP_HAL::panic(
+            "PANIC: scheduler system initialized called more than once");
+    }
+    //int exceptions = FE_OVERFLOW | FE_DIVBYZERO;
+#ifndef __i386__
+    // i386 with gcc doesn't work with FE_INVALID
+   // exceptions |= FE_INVALID;
+#endif
+#if !defined(HAL_BUILD_AP_PERIPH)
+    /* if (_sitlState->_sitl == nullptr || _sitlState->_sitl->float_exception) {
+        feenableexcept(exceptions);
+    } else {
+        feclearexcept(exceptions);
+    } */
+#else
+    feclearexcept(exceptions);
+#endif
+    _initialized = true;
+}
 
+void Scheduler::sitl_end_atomic() {
+    if (_nested_atomic_ctr == 0) {
+        hal.serial(0)->printf("NESTED ATOMIC ERROR\n");
+    } else {
+        _nested_atomic_ctr--;
+    }
+}
+
+void Scheduler::reboot(bool hold_in_bootloader)
+{
+    //HAL_SITL::actually_reboot();
+    abort();
+}
+
+void Scheduler::_run_timer_procs()
+{
     if (_in_timer_proc) {
+        // the timer calls took longer than the period of the
+        // timer. This is bad, and may indicate a serious
+        // driver failure. We can't just call the drivers
+        // again, as we could run out of stack. So we only
+        // call the _failsafe call. It's job is to detect if
+        // the drivers or the main loop are indeed dead and to
+        // activate whatever failsafe it thinks may help if
+        // need be.  We assume the failsafe code can't
+        // block. If it does then we will recurse and die when
+        // we run out of stack
+        if (_failsafe != nullptr) {
+            _failsafe();
+        }
         return;
     }
     _in_timer_proc = true;
 
     // now call the timer based drivers
-    for (i = 0; i < _num_timer_procs; i++) {
+    for (int i = 0; i < _num_timer_procs; i++) {
         if (_timer_proc[i]) {
             _timer_proc[i]();
         }
@@ -259,9 +259,12 @@ void Scheduler::_timer_task()
     _in_timer_proc = false;
 }
 
-void Scheduler::_run_io(void)
+void Scheduler::_run_io_procs()
 {
-    _io_semaphore.take_blocking();
+    if (_in_io_proc) {
+        return;
+    }
+    _in_io_proc = true;
 
     // now call the IO based drivers
     for (int i = 0; i < _num_io_procs; i++) {
@@ -270,164 +273,158 @@ void Scheduler::_run_io(void)
         }
     }
 
-    _io_semaphore.give();
+    _in_io_proc = false;
+
+    for (uint8_t i=0; i<hal.num_serial; i++) {
+        hal.serial(i)->_timer_tick();
+    }
+    hal.storage->_timer_tick();
+
+    // in lieu of a thread-per-bus:
+    //((HALSITL::I2CDeviceManager*)(hal.i2c_mgr))->_timer_tick();
+
+#if SITL_STACK_CHECKING_ENABLED
+    check_thread_stacks();
+#endif
+
+#if AP_RCPROTOCOL_ENABLED
+    AP::RC().update();
+#endif
 }
 
 /*
-  run timers for all UARTs
+  set simulation timestamp
  */
-void Scheduler::_run_uarts()
-{
-    // process any pending serial bytes
-    for (uint8_t i=0;i<hal.num_serial; i++) {
-        hal.serial(i)->_timer_tick();
-    }
-}
-
-void Scheduler::_rcin_task()
-{
-    RCInput::from(hal.rcin)->_timer_tick();
-}
-
-void Scheduler::_uart_task()
-{
-    _run_uarts();
-}
-
-void Scheduler::_io_task()
-{
-    // process any pending storage writes
-    hal.storage->_timer_tick();
-
-    // run registered IO processes
-    _run_io();
-}
-
-bool Scheduler::in_main_thread() const
-{
-    return pthread_equal(pthread_self(), _main_ctx);
-}
-
-void Scheduler::_wait_all_threads()
-{
-    int r = pthread_barrier_wait(&_initialized_barrier);
-    if (r == PTHREAD_BARRIER_SERIAL_THREAD) {
-        pthread_barrier_destroy(&_initialized_barrier);
-    }
-}
-
-void Scheduler::set_system_initialized()
-{
-    if (_initialized) {
-        AP_HAL::panic("PANIC: scheduler::set_system_initialized called more than once");
-    }
-
-    _initialized = true;
-
-    _wait_all_threads();
-}
-
-void Scheduler::reboot(bool hold_in_bootloader)
-{
-    exit(1);
-}
-
-#if APM_BUILD_TYPE(APM_BUILD_Replay) || APM_BUILD_TYPE(APM_BUILD_UNKNOWN)
 void Scheduler::stop_clock(uint64_t time_usec)
 {
-    if (time_usec < _stopped_clock_usec) {
-        ::fprintf(stderr, "Warning: setting time backwards from (%" PRIu64 ") to (%" PRIu64 ")\n", _stopped_clock_usec, time_usec);
-        return;
-    }
-
     _stopped_clock_usec = time_usec;
-    _run_io();
-}
-#else
-void Scheduler::stop_clock(uint64_t time_usec)
-{
-    // stop_clock() is not called outside of Replay, but we can't
-    // guard it in the header because of the vehicle-dependent-library
-    // checks in waf.
-}
-#endif
-
-bool Scheduler::SchedulerThread::_run()
-{
-    _sched._wait_all_threads();
-
-    return PeriodicThread::_run();
+    /* if (_sitlState->_sitl != nullptr && time_usec - _last_io_run > 10000) {
+        _last_io_run = time_usec;
+        _run_io_procs();
+    } */
 }
 
-void Scheduler::teardown()
+/*
+  trampoline for thread create
+*/
+void *Scheduler::thread_create_trampoline(void *ctx)
 {
-    _timer_thread.stop();
-    _io_thread.stop();
-    _rcin_thread.stop();
-    _uart_thread.stop();
-
-    _timer_thread.join();
-    _io_thread.join();
-    _rcin_thread.join();
-    _uart_thread.join();
-}
-
-// calculates an integer to be used as the priority for a newly-created thread
-uint8_t Scheduler::calculate_thread_priority(priority_base base, int8_t priority) const
-{
-    uint8_t thread_priority = APM_LINUX_IO_PRIORITY;
-    static const struct {
-        priority_base base;
-        uint8_t p;
-    } priority_map[] = {
-        { PRIORITY_BOOST, APM_LINUX_MAIN_PRIORITY},
-        { PRIORITY_MAIN, APM_LINUX_MAIN_PRIORITY},
-        { PRIORITY_SPI, AP_LINUX_SENSORS_SCHED_PRIO},
-        { PRIORITY_I2C, AP_LINUX_SENSORS_SCHED_PRIO},
-        { PRIORITY_CAN, APM_LINUX_TIMER_PRIORITY},
-        { PRIORITY_TIMER, APM_LINUX_TIMER_PRIORITY},
-        { PRIORITY_RCIN, APM_LINUX_RCIN_PRIORITY},
-        { PRIORITY_IO, APM_LINUX_IO_PRIORITY},
-        { PRIORITY_UART, APM_LINUX_UART_PRIORITY},
-        { PRIORITY_STORAGE, APM_LINUX_IO_PRIORITY},
-        { PRIORITY_SCRIPTING, APM_LINUX_SCRIPTING_PRIORITY},
-        { PRIORITY_NET, APM_LINUX_NET_PRIORITY},
-    };
-    for (uint8_t i=0; i<ARRAY_SIZE(priority_map); i++) {
-        if (priority_map[i].base == base) {
-            thread_priority = constrain_int16(priority_map[i].p + priority, 1, APM_LINUX_MAX_PRIORITY);
-            break;
+    struct thread_attr *a = (struct thread_attr *)ctx;
+    a->thread = pthread_self();
+    a->f[0]();
+    
+    WITH_SEMAPHORE(_thread_sem);
+    if (threads == a) {
+        threads = a->next;
+    } else {
+        for (struct thread_attr *p=threads; p->next; p=p->next) {
+            if (p->next == a) {
+                p->next = p->next->next;
+                break;
+            }
         }
     }
-
-    return thread_priority;
+    free(a->stack);
+    free(a->f);
+    delete a;
+    return nullptr;
 }
+
+#ifndef PTHREAD_STACK_MIN
+#define PTHREAD_STACK_MIN 16384U
+#endif
 
 /*
   create a new thread
 */
 bool Scheduler::thread_create(AP_HAL::MemberProc proc, const char *name, uint32_t stack_size, priority_base base, int8_t priority)
 {
-    Thread *thread = NEW_NOTHROW Thread{(Thread::task_t)proc};
-    if (!thread) {
+    WITH_SEMAPHORE(_thread_sem);
+
+    // even an empty thread takes 2500 bytes on Linux, so always add 2300, giving us 200 bytes
+    // safety margin
+    stack_size += 2300;
+    
+    pthread_t thread {};
+    const uint32_t alloc_stack = MAX(size_t(PTHREAD_STACK_MIN),stack_size);
+
+    struct thread_attr *a = NEW_NOTHROW struct thread_attr;
+    if (!a) {
         return false;
     }
+    // take a copy of the MemberProc, it is freed after thread exits
+    a->f = (AP_HAL::MemberProc *)malloc(sizeof(proc));
+    if (!a->f) {
+        goto failed;
+    }
+    if (posix_memalign(&a->stack, 4096, alloc_stack) != 0) {
+        goto failed;
+    }
+    if (!a->stack) {
+        goto failed;
+    }
+    memset(a->stack, stackfill, alloc_stack);
+    a->stack_min = (const uint8_t *)((((uint8_t *)a->stack) + alloc_stack) - stack_size);
 
-    const uint8_t thread_priority = calculate_thread_priority(base, priority);
+    a->stack_size = stack_size;
+    a->f[0] = proc;
+    a->name = name;
 
-    // Add 256k to HAL-independent requested stack size
-    thread->set_stack_size(256 * 1024 + stack_size);
-
-    /*
-     * We should probably store the thread handlers and join() when exiting,
-     * but let's the thread manage itself for now.
-     */
-    thread->set_auto_free(true);
-
-    if (!thread->start(name, SCHED_FIFO, thread_priority)) {
-        delete thread;
-        return false;
+    if (pthread_attr_init(&a->attr) != 0) {
+        goto failed;
+    }
+#if SITL_STACK_CHECKING_ENABLED
+    if (pthread_attr_setstack(&a->attr, a->stack, alloc_stack) != 0) {
+        AP_HAL::panic("Failed to set stack of size %u for thread %s", alloc_stack, name);
+    }
+#endif
+    if (pthread_create(&thread, &a->attr, thread_create_trampoline, a) != 0) {
+        goto failed;
     }
 
+#if !defined(__APPLE__) && !defined(__OpenBSD__)
+    pthread_setname_np(thread, name);
+#endif
+
+    a->next = threads;
+    threads = a;
     return true;
+
+failed:
+    if (a->stack) {
+        free(a->stack);
+    }
+    if (a->f) {
+        free(a->f);
+    }
+    delete a;
+    return false;
+}
+
+/*
+  check for stack overflow
+ */
+void Scheduler::check_thread_stacks(void)
+{
+    WITH_SEMAPHORE(_thread_sem);
+    for (struct thread_attr *p=threads; p; p=p->next) {
+        const uint8_t ncheck = 8;
+        for (uint8_t i=0; i<ncheck; i++) {
+            if (p->stack_min[i] != stackfill) {
+                AP_HAL::panic("stack overflow in thread %s", p->name);
+            }
+        }
+    }
+}
+
+// get the name of the current thread, or nullptr if not known
+const char *Scheduler::get_current_thread_name(void) const
+{
+    const pthread_t self = pthread_self();
+    for (struct thread_attr *a=threads; a; a=a->next) {
+        if (a->thread == self) {
+            return a->name;
+        }
+    }
+    return nullptr;
 }

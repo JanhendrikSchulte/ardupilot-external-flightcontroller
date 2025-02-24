@@ -4,9 +4,9 @@
 
 #include <signal.h>
 
-class HAL_Linux : public AP_HAL::HAL {
+class HAL_EXTERNAL_FC : public AP_HAL::HAL {
 public:
-    HAL_Linux();
+    HAL_EXTERNAL_FC();
     void run(int argc, char* const* argv, Callbacks* callbacks) const override;
 
     void setup_signal_handlers() const;

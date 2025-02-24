@@ -4,7 +4,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-using namespace Linux;
+using namespace EXTERNAL_FC;
 
 // construct a semaphore
 Semaphore::Semaphore()

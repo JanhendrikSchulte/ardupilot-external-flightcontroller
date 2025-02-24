@@ -18,7 +18,7 @@
  * When creating a new HAL, declare a new HAL_BOARD_ in AP_HAL/AP_HAL_Boards.h
  */
 
-#if CONFIG_HAL_BOARD == HAL_BOARD_LINUX
+#if CONFIG_HAL_BOARD == HAL_BOARD_EXTERNAL_FC
 
 #include "HAL_EXTERNAL_FC_Class.h"
 
